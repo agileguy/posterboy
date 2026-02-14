@@ -5,7 +5,12 @@ import { readConfig, getApiKey, getDefaultProfile } from "../../lib/config";
 import { ApiClient } from "../../lib/api";
 import { createOutputFormatter } from "../../lib/output";
 import { UserError } from "../../lib/errors";
-import { validatePlatforms, validateMutuallyExclusive } from "../../lib/validation";
+import {
+  validatePlatforms,
+  validateMutuallyExclusive,
+  validateISODate,
+  validateTimezone,
+} from "../../lib/validation";
 import {
   validateContentTypeForPlatforms,
   validatePlatformRequirements,
@@ -195,6 +200,22 @@ export async function postVideo(
 
   // Validate platform-specific requirements
   validatePlatformRequirements(platforms, params);
+
+  // Validate scheduling flags
+  if (values.schedule && values.queue) {
+    throw new UserError(
+      "--schedule and --queue are mutually exclusive.\n" +
+        "Use --schedule for a specific date/time, or --queue to use the next available slot."
+    );
+  }
+
+  if (values.schedule) {
+    validateISODate(values.schedule as string);
+  }
+
+  if (values.timezone) {
+    validateTimezone(values.timezone as string);
+  }
 
   // Build full VideoPostParams
   const postParams: VideoPostParams = {
