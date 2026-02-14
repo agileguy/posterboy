@@ -1,6 +1,6 @@
 {
   "name": "posterboy",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "CLI for posting to social media via Upload-Post.com API",
   "type": "module",
   "main": "./dist/index.js",
