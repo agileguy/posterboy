@@ -6,6 +6,11 @@ import { parseArgs } from "node:util";
 import { VERSION } from "./constants";
 import { authLogin } from "./commands/auth/login";
 import { authStatus } from "./commands/auth/status";
+import { profilesList } from "./commands/profiles/list";
+import { profilesCreate } from "./commands/profiles/create";
+import { profilesDelete } from "./commands/profiles/delete";
+import { profilesConnect } from "./commands/profiles/connect";
+import { platforms, platformsPages } from "./commands/platforms";
 import { createOutputFormatter } from "./lib/output";
 import { PosterBoyError } from "./lib/errors";
 import type { GlobalFlags } from "./lib/types";
@@ -123,12 +128,18 @@ async function main() {
         break;
 
       case "profiles":
+        await handleProfilesCommand(subcommand, remainingArgs, globalFlags);
+        break;
+
+      case "platforms":
+        await handlePlatformsCommand(subcommand, remainingArgs, globalFlags);
+        break;
+
       case "post":
       case "schedule":
       case "status":
       case "history":
       case "queue":
-      case "platforms":
       case "analytics":
         console.error(`Command '${command}' not implemented yet`);
         process.exit(1);
@@ -165,6 +176,64 @@ async function handleAuthCommand(
       process.exit(1);
       break;
   }
+}
+
+async function handleProfilesCommand(
+  subcommand: string | undefined,
+  args: string[],
+  globalFlags: GlobalFlags
+): Promise<void> {
+  switch (subcommand) {
+    case "list":
+      await profilesList(args, globalFlags);
+      break;
+
+    case "create":
+      await profilesCreate(args, globalFlags);
+      break;
+
+    case "delete":
+      await profilesDelete(args, globalFlags);
+      break;
+
+    case "connect":
+      await profilesConnect(args, globalFlags);
+      break;
+
+    default:
+      console.error(`Unknown profiles subcommand: ${subcommand}`);
+      console.error("Available: list, create, delete, connect");
+      process.exit(1);
+      break;
+  }
+}
+
+async function handlePlatformsCommand(
+  subcommand: string | undefined,
+  args: string[],
+  globalFlags: GlobalFlags
+): Promise<void> {
+  // If no subcommand, show platform list
+  if (!subcommand) {
+    await platforms(args, globalFlags);
+    return;
+  }
+
+  // Handle "pages" subcommand with platform-specific routing
+  if (subcommand === "pages") {
+    const [platformSubcmd, ...remainingArgs] = args;
+    if (!platformSubcmd) {
+      console.error("Platform required for pages command");
+      console.error("Available: facebook, linkedin, pinterest");
+      process.exit(1);
+    }
+    await platformsPages(platformSubcmd, remainingArgs, globalFlags);
+    return;
+  }
+
+  console.error(`Unknown platforms subcommand: ${subcommand}`);
+  console.error("Available: pages");
+  process.exit(1);
 }
 
 async function handleError(error: unknown): Promise<void> {
