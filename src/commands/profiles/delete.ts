@@ -63,7 +63,7 @@ export async function profilesDelete(
   }
 
   // Call API to delete
-  const client = new ApiClient(apiKey);
+  const client = new ApiClient(apiKey, { verbose: globalFlags.verbose });
   const result = await client.deleteUser(username);
 
   // Output results

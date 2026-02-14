@@ -52,7 +52,7 @@ export async function queuePreview(
 
   // Get API key and create client
   const apiKey = getApiKey(globalFlags.apiKey, config?.api_key);
-  const client = new ApiClient(apiKey);
+  const client = new ApiClient(apiKey, { verbose: globalFlags.verbose });
 
   // Fetch preview
   const result = await client.previewQueue(profile, count);

@@ -41,7 +41,7 @@ export async function platforms(
   const apiKey = getApiKey(globalFlags.apiKey, config?.api_key);
 
   // Call API to get user profile
-  const client = new ApiClient(apiKey);
+  const client = new ApiClient(apiKey, { verbose: globalFlags.verbose });
   const result = await client.getUserProfile(profile);
 
   // Output results
@@ -124,7 +124,7 @@ export async function platformsPages(
   const apiKey = getApiKey(globalFlags.apiKey, config?.api_key);
 
   // Create API client
-  const client = new ApiClient(apiKey);
+  const client = new ApiClient(apiKey, { verbose: globalFlags.verbose });
 
   // Output formatter
   const formatter = createOutputFormatter(

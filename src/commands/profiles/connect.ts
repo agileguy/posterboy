@@ -46,7 +46,7 @@ export async function profilesConnect(
   const apiKey = getApiKey(globalFlags.apiKey, config?.api_key);
 
   // Call API to generate JWT
-  const client = new ApiClient(apiKey);
+  const client = new ApiClient(apiKey, { verbose: globalFlags.verbose });
   const result = await client.generateJwt(username, { platforms, redirect });
 
   // Output results

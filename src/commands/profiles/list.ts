@@ -16,7 +16,7 @@ export async function profilesList(
   const apiKey = getApiKey(globalFlags.apiKey, config?.api_key);
 
   // Call API
-  const client = new ApiClient(apiKey);
+  const client = new ApiClient(apiKey, { verbose: globalFlags.verbose });
   const result = await client.listUsers();
 
   // Output results

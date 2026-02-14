@@ -287,7 +287,7 @@ export async function postPhoto(
 
   // Get API key and create client
   const apiKey = getApiKey(globalFlags.apiKey, config?.api_key);
-  const client = new ApiClient(apiKey);
+  const client = new ApiClient(apiKey, { verbose: globalFlags.verbose });
 
   // Call API
   const result = await client.postPhotos(postParams);
