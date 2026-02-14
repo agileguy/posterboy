@@ -1,4 +1,4 @@
-export const VERSION = "0.1.0";
+export const VERSION = "0.1.2";
 export const CONFIG_DIR = `${process.env.HOME}/.posterboy`;
 export const CONFIG_FILE = `${CONFIG_DIR}/config.json`;
 export const API_BASE_URL = "https://api.upload-post.com/api";
