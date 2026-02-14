@@ -22,8 +22,12 @@ import { scheduleModify } from "./commands/schedule/modify";
 import { queueSettings } from "./commands/queue/settings";
 import { queuePreview } from "./commands/queue/preview";
 import { queueNext } from "./commands/queue/next";
+import { history } from "./commands/history";
+import { analytics } from "./commands/analytics";
+import { completions } from "./commands/completions";
 import { createOutputFormatter } from "./lib/output";
-import { PosterBoyError } from "./lib/errors";
+import { PosterBoyError, suggestFix } from "./lib/errors";
+import { suggestCommand } from "./lib/suggestions";
 import type { GlobalFlags } from "./lib/types";
 
 const HELP_TEXT = `posterboy - Social media posting CLI
@@ -81,15 +85,29 @@ COMMANDS:
 
   analytics           View profile analytics
 
+  completions         Generate shell completions
+    bash              Generate bash completion script
+    zsh               Generate zsh completion script
+    fish              Generate fish completion script
+
 EXAMPLES:
   posterboy auth login --key up_xxxx
   posterboy auth status
   posterboy post text --body "Hello!" --platforms x,linkedin
   posterboy post photo --files photo.jpg --title "My photo" --platforms instagram
   posterboy history
+  posterboy completions bash > /etc/bash_completion.d/posterboy
 `;
 
 async function main() {
+  // Handle EPIPE errors (e.g., when piping to head)
+  process.stdout.on("error", (err) => {
+    const nodeErr = err as { code?: string };
+    if (nodeErr.code === "EPIPE") {
+      process.exit(0);
+    }
+  });
+
   const args = Bun.argv.slice(2);
 
   // Handle --version and --help at the top level
@@ -163,16 +181,26 @@ async function main() {
         break;
 
       case "history":
-      case "analytics":
-        console.error(`Command '${command}' not implemented yet`);
-        process.exit(1);
+        await history(remainingArgs, globalFlags);
         break;
 
-      default:
+      case "analytics":
+        await handleAnalyticsCommand(subcommand, remainingArgs, globalFlags);
+        break;
+
+      case "completions":
+        await completions(remainingArgs, globalFlags);
+        break;
+
+      default: {
+        const suggestion = suggestCommand(command);
         console.error(`Unknown command: ${command}`);
+        if (suggestion) {
+          console.error(`Did you mean '${suggestion}'?`);
+        }
         console.error("Run 'posterboy --help' for usage information");
         process.exit(1);
-        break;
+      }
     }
   } catch (error) {
     await handleError(error);
@@ -184,6 +212,21 @@ async function handleAuthCommand(
   args: string[],
   globalFlags: GlobalFlags
 ): Promise<void> {
+  if (!subcommand || subcommand === "help" || subcommand === "--help") {
+    console.log(`posterboy auth - Authentication and account management
+
+SUBCOMMANDS:
+  login         Store API key in config
+  status        Show account info, plan, and usage
+
+FLAGS:
+  --key         API key (for login)
+  --json        Force JSON output
+  --verbose     Show request/response details
+`);
+    return;
+  }
+
   switch (subcommand) {
     case "login":
       await authLogin(args, globalFlags);
@@ -206,6 +249,25 @@ async function handleProfilesCommand(
   args: string[],
   globalFlags: GlobalFlags
 ): Promise<void> {
+  if (!subcommand || subcommand === "help" || subcommand === "--help") {
+    console.log(`posterboy profiles - Profile management
+
+SUBCOMMANDS:
+  list          List all connected profiles
+  create        Create a new profile
+  delete        Delete a profile
+  connect       Generate JWT URL to connect social accounts
+
+FLAGS:
+  --username    Profile username (for create/delete/connect)
+  --platforms   Target platforms for connection (for connect)
+  --redirect    Redirect URL after auth (for connect)
+  --json        Force JSON output
+  --verbose     Show request/response details
+`);
+    return;
+  }
+
   switch (subcommand) {
     case "list":
       await profilesList(args, globalFlags);
@@ -236,9 +298,30 @@ async function handlePlatformsCommand(
   args: string[],
   globalFlags: GlobalFlags
 ): Promise<void> {
-  // If no subcommand, show platform list
+  // If no subcommand or help, show platform list or help
   if (!subcommand) {
     await platforms(args, globalFlags);
+    return;
+  }
+
+  if (subcommand === "help" || subcommand === "--help") {
+    console.log(`posterboy platforms - List connected platforms
+
+USAGE:
+  posterboy platforms [--profile <name>]
+  posterboy platforms pages <platform> [--profile <name>]
+
+SUBCOMMANDS:
+  pages         List platform-specific pages/boards
+    facebook    List Facebook pages
+    linkedin    List LinkedIn pages
+    pinterest   List Pinterest boards
+
+FLAGS:
+  --profile     Profile to check platforms for
+  --json        Force JSON output
+  --verbose     Show request/response details
+`);
     return;
   }
 
@@ -264,6 +347,27 @@ async function handlePostCommand(
   args: string[],
   globalFlags: GlobalFlags
 ): Promise<void> {
+  if (!subcommand || subcommand === "help" || subcommand === "--help") {
+    console.log(`posterboy post - Content posting
+
+SUBCOMMANDS:
+  text          Post text content
+  photo         Post photo(s) / carousel
+  video         Post video content
+  document      Post document (LinkedIn only)
+
+FLAGS:
+  --profile     Profile to post from
+  --platforms   Target platforms (comma-separated)
+  --schedule    ISO-8601 datetime for scheduling
+  --queue       Add to next queue slot
+  --dry-run     Preview without posting
+  --json        Force JSON output
+  --verbose     Show request/response details
+`);
+    return;
+  }
+
   switch (subcommand) {
     case "text":
       await postText(args, globalFlags);
@@ -300,6 +404,26 @@ async function handleScheduleCommand(
   args: string[],
   globalFlags: GlobalFlags
 ): Promise<void> {
+  if (!subcommand || subcommand === "help" || subcommand === "--help") {
+    console.log(`posterboy schedule - Scheduled post management
+
+SUBCOMMANDS:
+  list          List all scheduled posts
+  cancel        Cancel a scheduled post
+  modify        Modify a scheduled post
+
+FLAGS:
+  --profile     Filter by profile (for list)
+  --id          Job ID (for cancel/modify)
+  --schedule    New schedule time (for modify)
+  --title       New title (for modify)
+  --timezone    New timezone (for modify)
+  --json        Force JSON output
+  --verbose     Show request/response details
+`);
+    return;
+  }
+
   switch (subcommand) {
     case "list":
       await scheduleList(args, globalFlags);
@@ -326,6 +450,26 @@ async function handleQueueCommand(
   args: string[],
   globalFlags: GlobalFlags
 ): Promise<void> {
+  if (!subcommand || subcommand === "help" || subcommand === "--help") {
+    console.log(`posterboy queue - Queue management
+
+SUBCOMMANDS:
+  settings      View or update queue configuration
+  preview       Preview upcoming queue slots
+  next          Get next available queue slot
+
+FLAGS:
+  --profile     Profile to manage queue for
+  --count       Number of slots to preview (for preview)
+  --enabled     Enable/disable queue (for settings)
+  --times       Queue times (comma-separated, for settings)
+  --timezone    Queue timezone (for settings)
+  --json        Force JSON output
+  --verbose     Show request/response details
+`);
+    return;
+  }
+
   switch (subcommand) {
     case "settings":
       await queueSettings(args, globalFlags);
@@ -347,11 +491,25 @@ async function handleQueueCommand(
   }
 }
 
+async function handleAnalyticsCommand(
+  subcommand: string | undefined,
+  args: string[],
+  globalFlags: GlobalFlags
+): Promise<void> {
+  // The subcommand IS the profile name for analytics (like status command)
+  const allArgs = subcommand ? [subcommand, ...args] : args;
+  await analytics(allArgs, globalFlags);
+}
+
 async function handleError(error: unknown): Promise<void> {
   const formatter = createOutputFormatter(false, false, true);
 
   if (error instanceof PosterBoyError) {
     formatter.error(error.message);
+    const fix = suggestFix(error);
+    if (fix) {
+      console.error(`\nTip: ${fix}`);
+    }
     process.exit(error.exitCode);
   } else if (error instanceof Error) {
     formatter.error(error.message);

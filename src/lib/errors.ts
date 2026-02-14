@@ -75,7 +75,7 @@ export class RateLimitError extends ApiError {
     limit: number;
     remaining: number;
   };
-  
+
   constructor(
     message: string,
     usage: { count: number; limit: number; remaining: number }
@@ -83,7 +83,7 @@ export class RateLimitError extends ApiError {
     super(message, 429, message);
     this.usage = usage;
   }
-  
+
   override json() {
     return {
       success: false as const,
@@ -94,4 +94,29 @@ export class RateLimitError extends ApiError {
       usage: this.usage,
     };
   }
+}
+
+/**
+ * Suggest a fix for common error scenarios
+ */
+export function suggestFix(error: PosterBoyError): string | null {
+  const msg = error.message.toLowerCase();
+
+  if (msg.includes("api key") || msg.includes("unauthorized") || msg.includes("authentication")) {
+    return "Run 'posterboy auth login --key <your-key>' to set up authentication";
+  }
+
+  if (msg.includes("profile required") || msg.includes("profile not found")) {
+    return "Set a default profile: posterboy profiles create --username <name>";
+  }
+
+  if (msg.includes("platform") && (msg.includes("not connected") || msg.includes("invalid"))) {
+    return "See available platforms: posterboy platforms --profile <name>";
+  }
+
+  if (msg.includes("file not found") || msg.includes("no such file")) {
+    return "Check that the file path is correct and the file exists";
+  }
+
+  return null;
 }

@@ -22,7 +22,7 @@ export async function scheduleList(
   // Get config and API key
   const config = readConfig();
   const apiKey = getApiKey(globalFlags.apiKey, config?.api_key);
-  const client = new ApiClient(apiKey);
+  const client = new ApiClient(apiKey, { verbose: globalFlags.verbose });
 
   // Profile is optional for list command
   const profile = values.profile as string | undefined || globalFlags.profile || getDefaultProfile(undefined, config);

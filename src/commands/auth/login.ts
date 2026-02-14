@@ -36,7 +36,7 @@ export async function authLogin(
   }
 
   // Validate the key by calling API
-  const client = new ApiClient(apiKey);
+  const client = new ApiClient(apiKey, { verbose: globalFlags.verbose });
   const accountInfo = await client.me();
 
   // Load existing config (or create new one)

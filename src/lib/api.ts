@@ -20,15 +20,18 @@ import type {
   QueueSettings,
   QueueSettingsUpdate,
   QueueSlot,
+  HistoryEntry,
 } from "./types";
 
 export class ApiClient {
   private apiKey: string;
   private baseUrl: string;
+  private verbose: boolean;
 
-  constructor(apiKey: string, baseUrl: string = API_BASE_URL) {
+  constructor(apiKey: string, options?: { baseUrl?: string; verbose?: boolean }) {
     this.apiKey = apiKey;
-    this.baseUrl = baseUrl;
+    this.baseUrl = options?.baseUrl ?? API_BASE_URL;
+    this.verbose = options?.verbose ?? false;
   }
 
   private async request<T>(
@@ -40,6 +43,18 @@ export class ApiClient {
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 30000);
+
+    if (this.verbose) {
+      const headers = {
+        Authorization: `Bearer ${this.apiKey.substring(0, 7)}...`,
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      };
+      console.error(`[verbose] → ${method} ${url}`);
+      console.error(`[verbose]   Headers: ${JSON.stringify(headers)}`);
+    }
+
+    const startTime = Date.now();
 
     try {
       const response = await fetch(url, {
@@ -54,6 +69,11 @@ export class ApiClient {
       });
 
       clearTimeout(timeoutId);
+
+      const elapsed = Date.now() - startTime;
+      if (this.verbose) {
+        console.error(`[verbose] ← ${response.status} ${response.statusText} (${elapsed}ms)`);
+      }
 
       if (!response.ok) {
         const errorBody = await response.text();
@@ -80,6 +100,9 @@ export class ApiClient {
       }
     } catch (error) {
       clearTimeout(timeoutId);
+      if (this.verbose && error instanceof Error) {
+        console.error(`[verbose] ✗ ${error.message}`);
+      }
       if (error instanceof ApiError) throw error;
       if (error instanceof Error && error.name === "AbortError") {
         throw new NetworkError("Request timeout after 30 seconds");
@@ -100,6 +123,17 @@ export class ApiClient {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 120000); // 120s timeout for uploads
 
+    if (this.verbose) {
+      const headers = {
+        Authorization: `Bearer ${this.apiKey.substring(0, 7)}...`,
+        Accept: "application/json",
+      };
+      console.error(`[verbose] → ${method} ${url} (upload)`);
+      console.error(`[verbose]   Headers: ${JSON.stringify(headers)}`);
+    }
+
+    const startTime = Date.now();
+
     try {
       const response = await fetch(url, {
         method,
@@ -113,6 +147,11 @@ export class ApiClient {
       });
 
       clearTimeout(timeoutId);
+
+      const elapsed = Date.now() - startTime;
+      if (this.verbose) {
+        console.error(`[verbose] ← ${response.status} ${response.statusText} (${elapsed}ms)`);
+      }
 
       if (!response.ok) {
         const errorBody = await response.text();
@@ -139,6 +178,9 @@ export class ApiClient {
       }
     } catch (error) {
       clearTimeout(timeoutId);
+      if (this.verbose && error instanceof Error) {
+        console.error(`[verbose] ✗ ${error.message}`);
+      }
       if (error instanceof ApiError) throw error;
       if (error instanceof Error && error.name === "AbortError") {
         throw new NetworkError("Request timeout after 120 seconds");
@@ -479,5 +521,38 @@ export class ApiClient {
 
   async nextSlot(profile: string): Promise<{ next_slot: string; profile: string }> {
     return this.request<{ next_slot: string; profile: string }>("GET", `/uploadposts/queue/next-slot?profile=${encodeURIComponent(profile)}`);
+  }
+
+  // History
+  async getHistory(profile?: string, page?: number, limit?: number): Promise<{ history: HistoryEntry[]; page: number; total_pages: number }> {
+    const queryParams = new URLSearchParams();
+    if (profile) queryParams.set("profile", profile);
+    if (page !== undefined) queryParams.set("page", page.toString());
+    if (limit !== undefined) queryParams.set("limit", limit.toString());
+
+    const queryString = queryParams.toString();
+    const path = queryString ? `/uploadposts/history?${queryString}` : "/uploadposts/history";
+
+    return this.request<{ history: HistoryEntry[]; page: number; total_pages: number }>("GET", path);
+  }
+
+  // Analytics
+  async getAnalytics(
+    profile: string,
+    platforms?: string[],
+    facebookPage?: string,
+    linkedinPage?: string
+  ): Promise<{ profile: string; analytics: Record<string, Record<string, number | string>> }> {
+    const queryParams = new URLSearchParams();
+    if (platforms && platforms.length > 0) queryParams.set("platforms", platforms.join(","));
+    if (facebookPage) queryParams.set("facebook_page", facebookPage);
+    if (linkedinPage) queryParams.set("linkedin_page", linkedinPage);
+
+    const queryString = queryParams.toString();
+    const path = queryString
+      ? `/analytics/${encodeURIComponent(profile)}?${queryString}`
+      : `/analytics/${encodeURIComponent(profile)}`;
+
+    return this.request<{ profile: string; analytics: Record<string, Record<string, number | string>> }>("GET", path);
   }
 }

@@ -132,7 +132,7 @@ export async function queueSettings(
 
   // Get API key and create client
   const apiKey = getApiKey(globalFlags.apiKey, config?.api_key);
-  const client = new ApiClient(apiKey);
+  const client = new ApiClient(apiKey, { verbose: globalFlags.verbose });
 
   // Determine if this is a view or update operation
   const isUpdate = !!(
