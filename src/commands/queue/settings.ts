@@ -5,6 +5,7 @@ import { readConfig, getApiKey, getDefaultProfile } from "../../lib/config";
 import { ApiClient } from "../../lib/api";
 import { createOutputFormatter } from "../../lib/output";
 import { UserError } from "../../lib/errors";
+import { validateTimezone } from "../../lib/validation";
 import type { GlobalFlags, QueueSettingsUpdate } from "../../lib/types";
 
 /**
@@ -95,20 +96,6 @@ function parseDaysOfWeek(daysString: string): string[] {
 
   // Remove duplicates
   return [...new Set(normalized)];
-}
-
-/**
- * Validate IANA timezone format (basic check)
- */
-function validateTimezone(tz: string): boolean {
-  // Basic check: should contain at least one forward slash
-  if (!tz.includes("/")) {
-    throw new UserError(
-      `Invalid timezone format: ${tz}\n` +
-      `Expected IANA timezone format (e.g., "America/New_York", "Europe/London")`
-    );
-  }
-  return true;
 }
 
 export async function queueSettings(
