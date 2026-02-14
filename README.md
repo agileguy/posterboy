@@ -4,6 +4,11 @@ Social media posting CLI powered by [Upload Post](https://upload-post.com).
 
 ## Installation
 
+### npm (recommended)
+```bash
+npm install -g posterboy
+```
+
 ### From Source
 ```bash
 git clone https://github.com/agileguy/posterboy.git
@@ -12,9 +17,9 @@ bun install
 bun link
 ```
 
-### Binary
+### Compiled Binary
 ```bash
-bun build src/index.ts --compile --outfile posterboy
+bun run build:binary
 sudo mv posterboy /usr/local/bin/
 ```
 
@@ -99,4 +104,4 @@ Config file: `~/.posterboy/config.json`
 
 ## License
 
-MIT
+[MIT](LICENSE)
