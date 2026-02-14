@@ -66,7 +66,6 @@ describe("Auth Commands", () => {
       const globalFlags: GlobalFlags = {
         json: false,
         pretty: true,
-        config: testConfigPath,
         verbose: false,
       };
 
@@ -102,7 +101,6 @@ describe("Auth Commands", () => {
       const globalFlags: GlobalFlags = {
         json: true,
         pretty: false,
-        config: testConfigPath,
         verbose: false,
       };
 
@@ -128,7 +126,6 @@ describe("Auth Commands", () => {
       const globalFlags: GlobalFlags = {
         json: false,
         pretty: true,
-        config: testConfigPath,
         verbose: false,
       };
 
@@ -170,7 +167,6 @@ describe("Auth Commands", () => {
       const globalFlags: GlobalFlags = {
         json: false,
         pretty: true,
-        config: testConfigPath,
         verbose: false,
       };
 
@@ -204,7 +200,6 @@ describe("Auth Commands", () => {
       const globalFlags: GlobalFlags = {
         json: true,
         pretty: false,
-        config: testConfigPath,
         verbose: false,
       };
 
