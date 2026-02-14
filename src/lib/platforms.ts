@@ -1,5 +1,6 @@
 import type { Platform } from "../constants";
 import { ALL_PLATFORMS } from "../constants";
+import { UserError } from "./errors";
 
 export const PLATFORM_CAPABILITIES = {
   tiktok:    { text: false, photo: true,  video: true,  document: false },
@@ -19,9 +20,16 @@ export const PLATFORM_CAPABILITIES = {
  * @throws UserError if any platform name is invalid
  */
 export function validatePlatforms(platforms: string[]): Platform[] {
+  if (platforms.length === 0) {
+    throw new UserError(
+      "At least one platform is required.\n" +
+      `Valid platforms: ${ALL_PLATFORMS.join(", ")}`
+    );
+  }
+
   const invalid = platforms.filter(p => !ALL_PLATFORMS.includes(p as Platform));
   if (invalid.length > 0) {
-    throw new Error(
+    throw new UserError(
       `Invalid platform names: ${invalid.join(", ")}.\n` +
       `Valid platforms: ${ALL_PLATFORMS.join(", ")}`
     );
@@ -51,10 +59,10 @@ export function validateContentTypeForPlatforms(
   const unsupported = platforms.filter(
     p => !PLATFORM_CAPABILITIES[p][contentType]
   );
-  
+
   if (unsupported.length > 0) {
     const supported = getPlatformsForContentType(contentType);
-    throw new Error(
+    throw new UserError(
       `${unsupported.join(", ")} does not support ${contentType} posts.\n` +
       `Supported platforms for ${contentType}: ${supported.join(", ")}`
     );
@@ -73,27 +81,27 @@ export function validatePlatformRequirements(
     switch (platform) {
       case "facebook":
         if (!params.facebook_page) {
-          throw new Error(
+          throw new UserError(
             `Facebook requires --facebook-page flag.\n` +
             `Tip: Set a default in ~/.posterboy/config.json:\n` +
             `  "platform_defaults": { "facebook": { "page_id": "your-page-id" } }`
           );
         }
         break;
-      
+
       case "pinterest":
         if (!params.pinterest_board) {
-          throw new Error(
+          throw new UserError(
             `Pinterest requires --pinterest-board flag.\n` +
             `Tip: Set a default in ~/.posterboy/config.json:\n` +
             `  "platform_defaults": { "pinterest": { "board_id": "your-board-id" } }`
           );
         }
         break;
-      
+
       case "reddit":
         if (!params.reddit_subreddit) {
-          throw new Error(
+          throw new UserError(
             `Reddit requires --reddit-subreddit flag.\n` +
             `Tip: Set a default in ~/.posterboy/config.json:\n` +
             `  "platform_defaults": { "reddit": { "subreddit": "yoursubreddit" } }`

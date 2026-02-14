@@ -1,5 +1,18 @@
 import type { Platform } from "../constants";
 
+// Re-export Platform for convenience
+export type { Platform } from "../constants";
+
+// Global Flags
+export interface GlobalFlags {
+  json: boolean;
+  pretty: boolean;
+  config?: string;
+  apiKey?: string;
+  profile?: string;
+  verbose: boolean;
+}
+
 // Auth & Account
 export interface AccountInfo {
   email: string;

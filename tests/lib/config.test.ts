@@ -1,6 +1,6 @@
 import { describe, test, expect, beforeEach, afterEach } from "bun:test";
 import { readConfig, writeConfig, validateConfig, resolveValue, getApiKey } from "../../src/lib/config";
-import { existsSync, rmSync, mkdirSync } from "node:fs";
+import { existsSync, rmSync } from "node:fs";
 import type { Config } from "../../src/lib/types";
 
 const TEST_CONFIG_DIR = "/tmp/posterboy-test-config";

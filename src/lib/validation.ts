@@ -1,6 +1,7 @@
 import { validatePlatforms as validatePlatformNames } from "./platforms";
 import type { Platform } from "../constants";
 import { UserError } from "./errors";
+import { existsSync } from "node:fs";
 
 /**
  * Validate platform names and return typed Platform array
@@ -8,11 +9,11 @@ import { UserError } from "./errors";
 export function validatePlatforms(platforms: string[]): Platform[] {
   try {
     return validatePlatformNames(platforms);
-  } catch (error) {
-    if (error instanceof Error) {
-      throw new UserError(error.message);
+  } catch (_error) {
+    if (_error instanceof Error) {
+      throw new UserError(_error.message);
     }
-    throw error;
+    throw _error;
   }
 }
 
@@ -25,12 +26,12 @@ export function validateISODate(date: string): boolean {
     if (isNaN(parsed.getTime())) {
       throw new UserError(`Invalid ISO-8601 date: ${date}`);
     }
-    
+
     // Check if date is in the future
     if (parsed.getTime() <= Date.now()) {
       throw new UserError(`Schedule date must be in the future: ${date}`);
     }
-    
+
     // Check if date is within 365 days
     const maxDate = new Date();
     maxDate.setDate(maxDate.getDate() + 365);
@@ -39,11 +40,11 @@ export function validateISODate(date: string): boolean {
         `Schedule date must be within 365 days from now: ${date}`
       );
     }
-    
+
     return true;
-  } catch (error) {
-    if (error instanceof UserError) {
-      throw error;
+  } catch (_error) {
+    if (_error instanceof UserError) {
+      throw _error;
     }
     throw new UserError(`Invalid date format: ${date}`);
   }
@@ -57,7 +58,7 @@ export function validateTimezone(tz: string): boolean {
     // Try to create a date with the timezone
     Intl.DateTimeFormat(undefined, { timeZone: tz });
     return true;
-  } catch (error) {
+  } catch {
     throw new UserError(
       `Invalid timezone: ${tz}.\n` +
       `Must be a valid IANA timezone name (e.g., "America/New_York").`
@@ -69,13 +70,8 @@ export function validateTimezone(tz: string): boolean {
  * Validate that a file exists and is readable
  */
 export function validateFileExists(path: string): void {
-  try {
-    const file = Bun.file(path);
-    if (!file.size && file.size !== 0) {
-      throw new Error("File does not exist");
-    }
-  } catch (error) {
-    throw new UserError(`File not found or not readable: ${path}`);
+  if (!existsSync(path)) {
+    throw new UserError(`File not found: ${path}`);
   }
 }
 

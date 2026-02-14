@@ -131,12 +131,14 @@ async function main() {
       case "platforms":
       case "analytics":
         console.error(`Command '${command}' not implemented yet`);
-        process.exit(0);
+        process.exit(1);
+        break;
 
       default:
         console.error(`Unknown command: ${command}`);
         console.error("Run 'posterboy --help' for usage information");
         process.exit(1);
+        break;
     }
   } catch (error) {
     await handleError(error);
@@ -161,6 +163,7 @@ async function handleAuthCommand(
       console.error(`Unknown auth subcommand: ${subcommand}`);
       console.error("Available: login, status");
       process.exit(1);
+      break;
   }
 }
 

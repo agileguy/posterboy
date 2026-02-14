@@ -1,8 +1,8 @@
-import { CONFIG_DIR, CONFIG_FILE } from "../constants";
+import { CONFIG_FILE } from "../constants";
 import type { Config, Platform } from "./types";
 import { UserError } from "./errors";
-import { mkdirSync, readFileSync, writeFileSync, existsSync } from "node:fs";
-import { chmod } from "node:fs/promises";
+import { mkdirSync, readFileSync, existsSync } from "node:fs";
+import { writeFile, chmod } from "node:fs/promises";
 import { dirname } from "node:path";
 
 /**
@@ -46,12 +46,9 @@ export async function writeConfig(config: Config): Promise<void> {
   // Validate before writing
   validateConfig(config);
 
-  // Write config file
+  // Write config file with atomic permissions
   const content = JSON.stringify(config, null, 2);
-  writeFileSync(configPath, content, "utf-8");
-
-  // Set restrictive permissions (user-only read/write)
-  await chmod(configPath, 0o600);
+  await writeFile(configPath, content, { mode: 0o600 });
 
   // Ensure directory has correct permissions too
   await chmod(configDir, 0o700);
@@ -176,13 +173,13 @@ export function getDefaultProfile(
  * Get default platforms from all possible sources
  */
 export function getDefaultPlatforms(
-  flagValue?: string[],
+  flagValue?: Platform[],
   config?: Config | null
 ): Platform[] | undefined {
   // Handle comma-separated env var
   const envValue = process.env.POSTERBOY_PLATFORMS;
   const envPlatforms = envValue ? envValue.split(",") as Platform[] : undefined;
-  
+
   return resolveValue(
     flagValue,
     "", // Not used since we handle env manually above

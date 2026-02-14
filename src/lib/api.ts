@@ -20,6 +20,9 @@ export class ApiClient {
   ): Promise<T> {
     const url = `${this.baseUrl}${path}`;
 
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000);
+
     try {
       const response = await fetch(url, {
         method,
@@ -29,7 +32,10 @@ export class ApiClient {
           Accept: "application/json",
         },
         body: body ? JSON.stringify(body) : undefined,
+        signal: controller.signal,
       });
+
+      clearTimeout(timeoutId);
 
       if (!response.ok) {
         const errorBody = await response.text();
@@ -45,9 +51,21 @@ export class ApiClient {
         throw new ApiError(errorMessage, response.status, apiMessage);
       }
 
-      return (await response.json()) as T;
+      try {
+        return (await response.json()) as T;
+      } catch {
+        throw new ApiError(
+          "Invalid JSON response from API",
+          response.status,
+          "Response body was not valid JSON"
+        );
+      }
     } catch (error) {
+      clearTimeout(timeoutId);
       if (error instanceof ApiError) throw error;
+      if (error instanceof Error && error.name === "AbortError") {
+        throw new NetworkError("Request timeout after 30 seconds");
+      }
       throw new NetworkError(
         error instanceof Error ? error.message : "Network request failed"
       );

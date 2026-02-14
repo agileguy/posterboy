@@ -89,6 +89,8 @@ export class RateLimitError extends ApiError {
       success: false as const,
       error: this.message,
       code: "RATE_LIMIT",
+      statusCode: this.statusCode,
+      apiMessage: this.apiMessage,
       usage: this.usage,
     };
   }
