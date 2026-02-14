@@ -1,6 +1,10 @@
-# posterboy
+<p align="center">
+  <img src="assets/posterboy-banner.png" alt="posterboy" width="300">
+</p>
 
-Social media posting CLI powered by [Upload Post](https://upload-post.com).
+<h1 align="center">posterboy</h1>
+
+<p align="center">Social media posting CLI powered by <a href="https://upload-post.com">Upload Post</a>.</p>
 
 ## Installation
 
