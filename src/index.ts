@@ -2,7 +2,6 @@
 
 // posterboy - Main entry point
 
-import { parseArgs } from "node:util";
 import { VERSION } from "./constants";
 import { authLogin } from "./commands/auth/login";
 import { authStatus } from "./commands/auth/status";
@@ -122,33 +121,41 @@ async function main() {
   }
 
   try {
-    // Parse global flags
-    const { values, positionals } = parseArgs({
-      args,
-      options: {
-        json: { type: "boolean", default: false },
-        pretty: { type: "boolean", default: false },
-        config: { type: "string" },
-        "api-key": { type: "string" },
-        profile: { type: "string" },
-        verbose: { type: "boolean", default: false },
-        version: { type: "boolean" },
-        help: { type: "boolean" },
-      },
-      strict: false,
-      allowPositionals: true,
-    });
-
+    // Extract global flags manually from args before the command/subcommand.
+    // parseArgs with strict:false treats ALL unknown flags as booleans,
+    // which corrupts subcommand flags like --files, --body, --title etc.
+    // Instead, we scan for known global flags and consume them, then pass
+    // the rest (starting from command/subcommand) untouched to handlers.
     const globalFlags: GlobalFlags = {
-      json: values.json as boolean,
-      pretty: values.pretty as boolean,
-      config: values.config as string | undefined,
-      apiKey: values["api-key"] as string | undefined,
-      profile: values.profile as string | undefined,
-      verbose: values.verbose as boolean,
+      json: false,
+      pretty: false,
+      config: undefined,
+      apiKey: undefined,
+      profile: undefined,
+      verbose: false,
     };
 
-    const [command, subcommand, ...remainingArgs] = positionals;
+    const GLOBAL_BOOLEAN_FLAGS = new Set(["--json", "--pretty", "--verbose"]);
+    const GLOBAL_STRING_FLAGS = new Set(["--config", "--api-key", "--profile"]);
+
+    const filtered: string[] = [];
+    for (let i = 0; i < args.length; i++) {
+      const arg = args[i]!;
+      if (GLOBAL_BOOLEAN_FLAGS.has(arg)) {
+        if (arg === "--json") globalFlags.json = true;
+        else if (arg === "--pretty") globalFlags.pretty = true;
+        else if (arg === "--verbose") globalFlags.verbose = true;
+      } else if (GLOBAL_STRING_FLAGS.has(arg) && i + 1 < args.length) {
+        const val = args[++i]!;
+        if (arg === "--config") globalFlags.config = val;
+        else if (arg === "--api-key") globalFlags.apiKey = val;
+        else if (arg === "--profile") globalFlags.profile = val;
+      } else {
+        filtered.push(arg);
+      }
+    }
+
+    const [command, subcommand, ...remainingArgs] = filtered;
 
     // Route to command handlers
     switch (command) {
