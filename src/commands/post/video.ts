@@ -18,7 +18,7 @@ async function validateVideoFile(filePath: string): Promise<{ size: number }> {
   if (!(await file.exists())) {
     throw new UserError(`File not found: ${filePath}`);
   }
-  const ext = filePath.toLowerCase().split(".").pop();
+  const ext = filePath.toLowerCase().match(/\.([^./\\]+)$/)?.[1];
   if (!ext || !validExts.includes(`.${ext}`)) {
     throw new UserError(
       `Unsupported video format: ${filePath}. Supported: MP4, MOV, WebM, AVI`

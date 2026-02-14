@@ -29,7 +29,7 @@ async function validatePhotoFiles(files: string[]): Promise<void> {
         `File exceeds 8MB limit: ${filePath} (${(file.size / (1024 * 1024)).toFixed(1)}MB)`
       );
     }
-    const ext = filePath.toLowerCase().split(".").pop();
+    const ext = filePath.toLowerCase().match(/\.([^./\\]+)$/)?.[1];
     if (!ext || !validExts.includes(`.${ext}`)) {
       throw new UserError(
         `Unsupported format: ${filePath}. Supported: JPEG, PNG, GIF`

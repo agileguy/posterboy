@@ -24,7 +24,7 @@ async function validateDocumentFile(filePath: string): Promise<void> {
       `File exceeds 100MB limit: ${filePath} (${(file.size / (1024 * 1024)).toFixed(1)}MB)`
     );
   }
-  const ext = filePath.toLowerCase().split(".").pop();
+  const ext = filePath.toLowerCase().match(/\.([^./\\]+)$/)?.[1];
   if (!ext || !validExts.includes(`.${ext}`)) {
     throw new UserError(
       `Unsupported format: ${filePath}. Supported: PDF, PPT, PPTX, DOC, DOCX`
@@ -44,6 +44,7 @@ export async function postDocument(
       url: { type: "string" },
       title: { type: "string" },
       description: { type: "string" },
+      platforms: { type: "string" },
       profile: { type: "string" },
       "linkedin-page": { type: "string" },
       "linkedin-visibility": { type: "string" },
@@ -90,6 +91,15 @@ export async function postDocument(
         "  POSTERBOY_PROFILE=<name>                   (environment variable)\n" +
         '  "default_profile": "<name>"                (in ~/.posterboy/config.json)'
     );
+  }
+
+  // Documents are LinkedIn-only - validate if user passed --platforms
+  if (values.platforms) {
+    const platformList = (values.platforms as string).split(",").map(p => p.trim()).filter(p => p.length > 0);
+    const nonLinkedin = platformList.filter(p => p !== "linkedin");
+    if (nonLinkedin.length > 0) {
+      throw new UserError(`Document posts are only supported on LinkedIn. Unsupported: ${nonLinkedin.join(", ")}`);
+    }
   }
 
   // Build full DocumentPostParams

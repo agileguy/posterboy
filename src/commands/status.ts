@@ -24,6 +24,21 @@ export async function statusCheck(
     allowPositionals: true,
   });
 
+  // Validate mutual exclusivity - only one ID source allowed
+  const hasPositional = positionals.length > 0;
+  const hasRequestId = !!values["request-id"];
+  const hasJobId = !!values["job-id"];
+  const idSourceCount = [hasPositional, hasRequestId, hasJobId].filter(Boolean).length;
+
+  if (idSourceCount > 1) {
+    throw new UserError(
+      "Only one ID source allowed. Provide one of:\n" +
+        "  posterboy status <id>\n" +
+        "  posterboy status --request-id <id>\n" +
+        "  posterboy status --job-id <id>"
+    );
+  }
+
   // Get ID from positional arg, or explicit flags
   let id: string | undefined;
   let idType: "request_id" | "job_id" = "job_id";
