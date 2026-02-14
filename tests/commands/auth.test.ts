@@ -49,11 +49,6 @@ describe("Auth Commands", () => {
       const mockResponse = {
         email: "test@example.com",
         plan: "free",
-        usage: {
-          count: 0,
-          limit: 10,
-          remaining: 10,
-        },
       };
 
       global.fetch = mock(() =>
@@ -84,11 +79,6 @@ describe("Auth Commands", () => {
       const mockResponse = {
         email: "test@example.com",
         plan: "premium",
-        usage: {
-          count: 2,
-          limit: 100,
-          remaining: 98,
-        },
       };
 
       global.fetch = mock(() =>
@@ -150,11 +140,6 @@ describe("Auth Commands", () => {
       const mockResponse = {
         email: "test@example.com",
         plan: "free",
-        usage: {
-          count: 5,
-          limit: 10,
-          remaining: 5,
-        },
       };
 
       global.fetch = mock(() =>
@@ -176,18 +161,12 @@ describe("Auth Commands", () => {
       expect(output).toContain("Account Status");
       expect(output).toContain("test@example.com");
       expect(output).toContain("free");
-      expect(output).toContain("5 / 10");
     });
 
     test("outputs JSON format when --json flag is set", async () => {
       const mockResponse = {
         email: "test@example.com",
         plan: "free",
-        usage: {
-          count: 5,
-          limit: 10,
-          remaining: 5,
-        },
       };
 
       global.fetch = mock(() =>
@@ -210,9 +189,6 @@ describe("Auth Commands", () => {
 
       expect(parsed.email).toBe("test@example.com");
       expect(parsed.plan).toBe("free");
-      expect(parsed.usage.count).toBe(5);
-      expect(parsed.usage.limit).toBe(10);
-      expect(parsed.usage.remaining).toBe(5);
     });
   });
 });

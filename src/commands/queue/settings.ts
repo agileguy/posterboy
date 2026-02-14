@@ -152,11 +152,19 @@ export async function queueSettings(
     }
 
     if (values["set-slots"]) {
-      updates.slots = parseTimeSlots(values["set-slots"] as string);
+      const timeStrings = parseTimeSlots(values["set-slots"] as string);
+      updates.slots = timeStrings.map(s => {
+        const [hour, minute] = s.split(":").map(Number);
+        return { hour, minute };
+      });
     }
 
     if (values["set-days"]) {
-      updates.days_of_week = parseDaysOfWeek(values["set-days"] as string);
+      const dayNames = parseDaysOfWeek(values["set-days"] as string);
+      const dayToInt: Record<string, number> = {
+        sun: 0, mon: 1, tue: 2, wed: 3, thu: 4, fri: 5, sat: 6
+      };
+      updates.days_of_week = dayNames.map(d => dayToInt[d]);
     }
 
     // Call API to update settings
@@ -188,13 +196,23 @@ export async function queueSettings(
       formatter.json(settings);
     } else {
       // Pretty output
+      const slotsDisplay = settings.slots
+        .map((s: { hour: number; minute: number }) =>
+          `${String(s.hour).padStart(2, '0')}:${String(s.minute).padStart(2, '0')}`)
+        .join(", ");
+
+      const dayNames = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"];
+      const daysDisplay = settings.days_of_week
+        .map((d: number) => dayNames[d] || String(d))
+        .join(", ");
+
       const lines = [
         formatter.header("Queue Settings:"),
         "",
-        `  ${formatter.label("Profile:")}      ${settings.profile}`,
+        `  ${formatter.label("Profile:")}      ${settings.profile_username}`,
         `  ${formatter.label("Timezone:")}     ${settings.timezone}`,
-        `  ${formatter.label("Time Slots:")}   ${settings.slots.join(", ")}`,
-        `  ${formatter.label("Days Active:")}  ${settings.days_of_week.join(", ")}`,
+        `  ${formatter.label("Time Slots:")}   ${slotsDisplay}`,
+        `  ${formatter.label("Days Active:")}  ${daysDisplay}`,
       ];
       formatter.pretty(lines);
     }

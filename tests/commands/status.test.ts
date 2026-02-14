@@ -29,9 +29,11 @@ describe("statusCheck command", () => {
 
     const mockResult: StatusResult = {
       status: "completed",
-      results: {
-        tiktok: { success: true, publish_id: "123", url: "https://tiktok.com/test/123" },
-      },
+      completed: 1,
+      total: 1,
+      results: [
+        { platform: "tiktok", success: true, publish_id: "123", url: "https://tiktok.com/test/123" },
+      ],
     };
 
     configSpies.push(
@@ -129,9 +131,11 @@ describe("statusCheck command", () => {
 
     const mockResult: StatusResult = {
       status: "completed",
-      results: {
-        youtube: { success: true, publish_id: "abc", url: "https://youtube.com/watch?v=abc" },
-      },
+      completed: 1,
+      total: 1,
+      results: [
+        { platform: "youtube", success: true, publish_id: "abc", url: "https://youtube.com/watch?v=abc" },
+      ],
     };
 
     configSpies.push(

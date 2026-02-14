@@ -69,17 +69,17 @@ export async function queuePreview(
   } else {
     // Pretty output - table format
     const lines = [
-      formatter.header(`Next ${result.slots.length} Queue Slots:`),
+      formatter.header(`Next ${result.preview.length} Queue Slots:`),
       "",
     ];
 
-    if (result.slots.length === 0) {
+    if (result.preview.length === 0) {
       lines.push("  No upcoming slots available.");
     } else {
       // Table header
       const headers = ["Datetime", "Status"];
-      const rows = result.slots.map((slot) => [
-        slot.datetime,
+      const rows = result.preview.map((slot) => [
+        slot.slot_time,
         slot.available ? formatter.success("Available") : formatter.muted("Occupied"),
       ]);
 

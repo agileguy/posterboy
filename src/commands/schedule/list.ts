@@ -41,13 +41,13 @@ export async function scheduleList(
     formatter.json(result);
   } else {
     // Pretty output
-    if (result.count === 0) {
+    if (result.scheduled_posts.length === 0) {
       formatter.pretty([
         formatter.muted("No scheduled posts found."),
       ]);
     } else {
       const lines = [
-        formatter.header(`Scheduled Posts (${result.count})`),
+        formatter.header(`Scheduled Posts (${result.scheduled_posts.length})`),
         "",
       ];
 
@@ -58,9 +58,9 @@ export async function scheduleList(
         lines.push(`  ${formatter.label("Job ID:")}     ${post.job_id}`);
         lines.push(`  ${formatter.label("Date:")}       ${post.scheduled_date}`);
         lines.push(`  ${formatter.label("Platforms:")}  ${platformsList}`);
-        lines.push(`  ${formatter.label("Type:")}       ${post.content_type}`);
+        lines.push(`  ${formatter.label("Type:")}       ${post.media_type}`);
         lines.push(`  ${formatter.label("Title:")}      ${title}`);
-        lines.push(`  ${formatter.label("Profile:")}    ${post.profile}`);
+        lines.push(`  ${formatter.label("Profile:")}    ${post.user}`);
         lines.push("");
       }
 

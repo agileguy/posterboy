@@ -29,10 +29,10 @@ describe("queue commands", () => {
       };
 
       const mockSettings: QueueSettings = {
-        profile: "testuser",
+        profile_username: "testuser",
         timezone: "America/New_York",
-        slots: ["09:00", "12:00", "18:00"],
-        days_of_week: ["mon", "tue", "wed", "thu", "fri"],
+        slots: [{ hour: 9, minute: 0 }, { hour: 12, minute: 0 }, { hour: 18, minute: 0 }],
+        days_of_week: [1, 2, 3, 4, 5],
       };
 
       configSpies.push(spyOn(config, "readConfig").mockReturnValue(mockConfig));
@@ -55,7 +55,7 @@ describe("queue commands", () => {
 
       expect(mockGetQueueSettings).toHaveBeenCalledWith("testuser");
       expect(consoleLogSpy).toHaveBeenCalledWith(
-        expect.stringContaining('"profile": "testuser"')
+        expect.stringContaining('"profile_username": "testuser"')
       );
 
       consoleLogSpy.mockRestore();
@@ -129,7 +129,7 @@ describe("queue commands", () => {
       );
 
       expect(mockUpdateQueueSettings).toHaveBeenCalledWith("testuser", {
-        slots: ["08:00", "12:00", "16:00", "20:00"],
+        slots: [{ hour: 8, minute: 0 }, { hour: 12, minute: 0 }, { hour: 16, minute: 0 }, { hour: 20, minute: 0 }],
       });
 
       consoleLogSpy.mockRestore();
@@ -166,7 +166,7 @@ describe("queue commands", () => {
       );
 
       expect(mockUpdateQueueSettings).toHaveBeenCalledWith("testuser", {
-        days_of_week: ["mon", "wed", "fri"],
+        days_of_week: [1, 3, 5],
       });
 
       consoleLogSpy.mockRestore();
@@ -270,9 +270,9 @@ describe("queue commands", () => {
       };
 
       const mockSlots: QueueSlot[] = [
-        { datetime: "2026-02-14T09:00:00Z", available: true },
-        { datetime: "2026-02-14T12:00:00Z", available: false },
-        { datetime: "2026-02-14T18:00:00Z", available: true },
+        { slot_time: "2026-02-14T09:00:00Z", available: true },
+        { slot_time: "2026-02-14T12:00:00Z", available: false },
+        { slot_time: "2026-02-14T18:00:00Z", available: true },
       ];
 
       configSpies.push(spyOn(config, "readConfig").mockReturnValue(mockConfig));
@@ -281,7 +281,7 @@ describe("queue commands", () => {
         spyOn(config, "getDefaultProfile").mockReturnValue("testuser")
       );
 
-      const mockPreviewQueue = mock(async () => ({ slots: mockSlots }));
+      const mockPreviewQueue = mock(async () => ({ preview: mockSlots }));
       apiClientSpy = spyOn(api, "ApiClient").mockImplementation(
         () =>
           ({
@@ -306,7 +306,7 @@ describe("queue commands", () => {
       };
 
       const mockSlots: QueueSlot[] = [
-        { datetime: "2026-02-14T09:00:00Z", available: true },
+        { slot_time: "2026-02-14T09:00:00Z", available: true },
       ];
 
       configSpies.push(spyOn(config, "readConfig").mockReturnValue(mockConfig));
@@ -315,7 +315,7 @@ describe("queue commands", () => {
         spyOn(config, "getDefaultProfile").mockReturnValue("testuser")
       );
 
-      const mockPreviewQueue = mock(async () => ({ slots: mockSlots }));
+      const mockPreviewQueue = mock(async () => ({ preview: mockSlots }));
       apiClientSpy = spyOn(api, "ApiClient").mockImplementation(
         () =>
           ({
@@ -367,7 +367,6 @@ describe("queue commands", () => {
 
       const mockResult = {
         next_slot: "2026-02-14T09:00:00Z",
-        profile: "testuser",
       };
 
       configSpies.push(spyOn(config, "readConfig").mockReturnValue(mockConfig));
@@ -402,7 +401,6 @@ describe("queue commands", () => {
 
       const mockResult = {
         next_slot: "2026-02-14T09:00:00Z",
-        profile: "testuser",
       };
 
       configSpies.push(spyOn(config, "readConfig").mockReturnValue(mockConfig));

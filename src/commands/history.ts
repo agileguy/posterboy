@@ -61,18 +61,19 @@ export async function history(
         formatter.muted("No upload history found."),
       ]);
     } else {
+      const totalPages = Math.ceil(result.total / result.limit);
       const lines = [
-        formatter.header(`Upload History (page ${result.page} of ${result.total_pages})`),
+        formatter.header(`Upload History (page ${result.page} of ${totalPages})`),
         "",
       ];
 
       for (const entry of result.history) {
-        const date = entry.date.substring(0, 16).replace("T", " ");
+        const date = entry.created_at.substring(0, 16).replace("T", " ");
         const platformsList = entry.platforms.join(", ");
         const title = entry.title || "(no title)";
-        const contentType = entry.content_type.padEnd(8);
+        const mediaType = entry.media_type.padEnd(8);
 
-        lines.push(`  ${date}  ${contentType}  ${platformsList.padEnd(20)}  ${title}`);
+        lines.push(`  ${date}  ${mediaType}  ${platformsList.padEnd(20)}  ${title}`);
       }
 
       formatter.pretty(lines);

@@ -17,17 +17,17 @@ export interface GlobalFlags {
 export interface AccountInfo {
   email: string;
   plan: string;
-  usage: {
-    count: number;
-    limit: number;
-    remaining: number;
-  };
+  // NO usage block - usage only comes in upload responses
 }
 
 // Profiles
+export interface SocialAccounts {
+  [key: string]: { connected: boolean; username?: string } | boolean;
+}
+
 export interface Profile {
   username: string;
-  connected_platforms: Platform[];
+  social_accounts: SocialAccounts;
   created_at: string;
 }
 
@@ -54,27 +54,38 @@ export interface PostResult {
 }
 
 // Status
+export interface StatusPlatformResult {
+  platform: string;
+  success: boolean;
+  publish_id?: string;
+  url?: string;
+  error?: string;
+}
+
 export interface StatusResult {
   status: string;
-  results?: Record<string, PlatformResult>;
+  completed?: number;
+  total?: number;
+  results?: StatusPlatformResult[];
   error?: string;
 }
 
 // History
 export interface HistoryEntry {
   id: string;
-  date: string;
-  platforms: Platform[];
-  content_type: string;
+  created_at: string;
+  media_type: string;
   title: string;
   status: string;
-  profile: string;
+  user: string;
+  platforms: string[];
 }
 
 export interface HistoryResult {
   history: HistoryEntry[];
   page: number;
-  total_pages: number;
+  total: number;
+  limit: number;
 }
 
 // Text Post Parameters
@@ -258,47 +269,53 @@ export interface ScheduledPost {
   scheduled_date: string;
   platforms: Platform[];
   title?: string;
-  content_type: string;
-  profile: string;
+  media_type: string;
+  user: string;
 }
 
 export interface ScheduleListResult {
   scheduled_posts: ScheduledPost[];
-  count: number;
+  // NO count field
 }
 
 export interface ScheduleUpdate {
-  schedule?: string;
+  scheduled_date?: string;
   title?: string;
+  caption?: string;
   timezone?: string;
 }
 
 // Queue
+export interface QueueTimeSlot {
+  hour: number;
+  minute: number;
+}
+
 export interface QueueSettings {
-  profile: string;
+  profile_username: string;
   timezone: string;
-  slots: string[];
-  days_of_week: string[];
+  slots: QueueTimeSlot[];
+  days_of_week: number[];
 }
 
 export interface QueueSettingsUpdate {
   timezone?: string;
-  slots?: string[];
-  days_of_week?: string[];
+  slots?: QueueTimeSlot[];
+  days_of_week?: number[];
 }
 
 export interface QueueSlot {
-  datetime: string;
+  slot_time: string;
   available: boolean;
 }
 
 export interface QueuePreviewResult {
-  slots: QueueSlot[];
+  preview: QueueSlot[];
 }
 
 export interface QueueNextSlotResult {
   next_slot: string;
-  profile: string;
+  // NO profile field
 }
 
 // Platform Pages
@@ -327,14 +344,14 @@ export interface Analytics {
 
 export interface AnalyticsOpts {
   platforms?: Platform[];
-  facebook_page?: string;
-  linkedin_page?: string;
+  page_id?: string;
+  page_urn?: string;
 }
 
 // JWT
 export interface JwtOptions {
   platforms?: Platform[];
-  redirect?: string;
+  redirect_url?: string;
 }
 
 export interface JwtResult {

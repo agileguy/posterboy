@@ -26,25 +26,26 @@ describe("history command", () => {
       history: [
         {
           id: "1",
-          date: "2026-02-10T12:00:00Z",
+          created_at: "2026-02-10T12:00:00Z",
           platforms: ["x", "linkedin"],
-          content_type: "text",
+          media_type: "text",
           title: "Hello world",
           status: "completed",
-          profile: "testuser",
+          user: "testuser",
         },
         {
           id: "2",
-          date: "2026-02-09T09:30:00Z",
+          created_at: "2026-02-09T09:30:00Z",
           platforms: ["tiktok"],
-          content_type: "video",
+          media_type: "video",
           title: "My cool video",
           status: "completed",
-          profile: "testuser",
+          user: "testuser",
         },
       ],
       page: 1,
-      total_pages: 3,
+      total: 30,
+      limit: 10,
     };
 
     configSpies.push(
@@ -75,7 +76,8 @@ describe("history command", () => {
     const mockResult = {
       history: [],
       page: 2,
-      total_pages: 5,
+      total: 125,
+      limit: 25,
     };
 
     configSpies.push(
@@ -109,16 +111,17 @@ describe("history command", () => {
       history: [
         {
           id: "1",
-          date: "2026-02-10T12:00:00Z",
+          created_at: "2026-02-10T12:00:00Z",
           platforms: ["instagram"],
-          content_type: "photo",
+          media_type: "photo",
           title: "Photo post",
           status: "completed",
-          profile: "testuser",
+          user: "testuser",
         },
       ],
       page: 1,
-      total_pages: 1,
+      total: 10,
+      limit: 10,
     };
 
     configSpies.push(
@@ -213,7 +216,8 @@ describe("history command", () => {
     const mockResult = {
       history: [],
       page: 1,
-      total_pages: 1,
+      total: 0,
+      limit: 10,
     };
 
     configSpies.push(
@@ -245,7 +249,8 @@ describe("history command", () => {
     const mockResult = {
       history: [],
       page: 1,
-      total_pages: 1,
+      total: 0,
+      limit: 10,
     };
 
     configSpies.push(

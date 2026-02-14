@@ -28,12 +28,12 @@ export async function profilesList(
 
   if (formatter.mode() === "json") {
     formatter.json({
-      profiles: result.users,
-      count: result.users.length,
+      profiles: result.profiles,
+      count: result.profiles.length,
       limit: 2,
     });
   } else {
-    if (result.users.length === 0) {
+    if (result.profiles.length === 0) {
       formatter.pretty([
         formatter.header("Profiles"),
         "  No profiles found. Create one with: posterboy profiles create --username <name>",
@@ -41,9 +41,10 @@ export async function profilesList(
     } else {
       const lines = [formatter.header("Profiles")];
 
-      for (const profile of result.users) {
-        const platformsDisplay = profile.connected_platforms.length > 0
-          ? profile.connected_platforms.join(", ")
+      for (const profile of result.profiles) {
+        const platformsList = Object.keys(profile.social_accounts || {});
+        const platformsDisplay = platformsList.length > 0
+          ? platformsList.join(", ")
           : formatter.muted("none");
 
         const createdDate = new Date(profile.created_at).toLocaleDateString();
@@ -56,7 +57,7 @@ export async function profilesList(
         );
       }
 
-      lines.push(formatter.muted(`${result.users.length} / 2 profiles`));
+      lines.push(formatter.muted(`${result.profiles.length} / 2 profiles`));
 
       formatter.pretty(lines);
     }
