@@ -18,7 +18,7 @@ describe("ApiClient", () => {
     });
 
     test("accepts custom base URL", () => {
-      const customClient = new ApiClient(mockApiKey, "https://custom.api.com");
+      const customClient = new ApiClient(mockApiKey, { baseUrl: "https://custom.api.com" });
       expect(customClient).toBeDefined();
     });
   });
@@ -28,11 +28,7 @@ describe("ApiClient", () => {
       const mockResponse = {
         email: "test@example.com",
         plan: "free",
-        usage: {
-          count: 5,
-          limit: 10,
-          remaining: 5,
-        },
+        // NO usage block - usage only comes in upload responses
       };
 
       global.fetch = mock(() =>
@@ -83,13 +79,13 @@ describe("ApiClient", () => {
         capturedHeaders = options.headers;
         return Promise.resolve({
           ok: true,
-          json: () => Promise.resolve({ email: "test@example.com", plan: "free", usage: { count: 0, limit: 10, remaining: 10 } }),
+          json: () => Promise.resolve({ email: "test@example.com", plan: "free" }),
         });
       }) as any;
 
       await client.me();
       expect(capturedHeaders).toBeDefined();
-      expect((capturedHeaders as any)["Authorization"]).toBe(`Bearer ${mockApiKey}`);
+      expect((capturedHeaders as any)["Authorization"]).toBe(`Apikey ${mockApiKey}`);
     });
   });
 });

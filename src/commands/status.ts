@@ -150,12 +150,12 @@ export async function statusCheck(
 }
 
 function displayPrettyStatus(
-  result: { status: string; results?: Record<string, unknown>; error?: string },
+  result: { status: string; completed?: number; total?: number; results?: Array<{ platform: string; success: boolean; url?: string; error?: string }>; error?: string },
   formatter: ReturnType<typeof createOutputFormatter>
 ): void {
   const lines: string[] = [];
 
-  // Status header
+  // Status header with progress
   if (result.status === "completed") {
     lines.push(formatter.success("Status: Completed"));
   } else if (result.status === "failed") {
@@ -164,28 +164,23 @@ function displayPrettyStatus(
     lines.push(`Status: ${result.status}`);
   }
 
-  // Show error if present
+  if (result.completed !== undefined && result.total !== undefined) {
+    lines.push(`Progress: ${result.completed}/${result.total}`);
+  }
+
   if (result.error) {
     lines.push("");
     lines.push(formatter.color(`Error: ${result.error}`, "RED"));
   }
 
-  // Show platform results if available
-  if (result.results) {
+  if (result.results && Array.isArray(result.results)) {
     lines.push("");
     lines.push(formatter.header("Platform Results:"));
-    for (const [platform, platformResult] of Object.entries(result.results)) {
-      const pr = platformResult as {
-        success?: boolean;
-        url?: string;
-        error?: string;
-      };
+    for (const pr of result.results) {
       if (pr.success && pr.url) {
-        lines.push(`  ${platform.padEnd(12)} ${pr.url}`);
+        lines.push(`  ${pr.platform.padEnd(12)} ${pr.url}`);
       } else if (!pr.success && pr.error) {
-        lines.push(
-          `  ${platform.padEnd(12)} ${formatter.color("FAILED", "RED")} - ${pr.error}`
-        );
+        lines.push(`  ${pr.platform.padEnd(12)} ${formatter.color("FAILED", "RED")} - ${pr.error}`);
       }
     }
   }

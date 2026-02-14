@@ -55,22 +55,22 @@ export async function platforms(
     // JSON output: list all platforms with connection status
     const platformStatuses = ALL_PLATFORMS.map((platform) => ({
       platform,
-      connected: result.user.connected_platforms.includes(platform),
+      connected: !!result.profile.social_accounts?.[platform],
     }));
 
     formatter.json({
-      profile: result.user.username,
+      profile: result.profile.username,
       platforms: platformStatuses,
     });
   } else {
     // Pretty output: formatted list with indicators
     const lines = [
-      formatter.header(`Platforms for ${result.user.username}`),
+      formatter.header(`Platforms for ${result.profile.username}`),
       "",
     ];
 
     for (const platform of ALL_PLATFORMS) {
-      const connected = result.user.connected_platforms.includes(platform);
+      const connected = !!result.profile.social_accounts?.[platform];
       const indicator = connected
         ? formatter.success("✓")
         : formatter.muted("-");
@@ -82,7 +82,7 @@ export async function platforms(
     lines.push("");
     lines.push(
       formatter.muted(
-        `${result.user.connected_platforms.length} of ${ALL_PLATFORMS.length} platforms connected`
+        `${Object.keys(result.profile.social_accounts || {}).length} of ${ALL_PLATFORMS.length} platforms connected`
       )
     );
 

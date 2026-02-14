@@ -41,18 +41,17 @@ describe("schedule commands", () => {
             scheduled_date: "2026-03-01T14:00:00Z",
             platforms: ["x", "linkedin"],
             title: "Test Post",
-            content_type: "text",
-            profile: "testuser",
+            media_type: "text",
+            user: "testuser",
           },
           {
             job_id: "job-456",
             scheduled_date: "2026-03-02T10:00:00Z",
             platforms: ["threads"],
-            content_type: "photo",
-            profile: "testuser",
+            media_type: "photo",
+            user: "testuser",
           },
         ],
-        count: 2,
       };
 
       configSpies.push(spyOn(config, "readConfig").mockReturnValue(mockConfig));
@@ -82,7 +81,6 @@ describe("schedule commands", () => {
 
       const mockResult: ScheduleListResult = {
         scheduled_posts: [],
-        count: 0,
       };
 
       configSpies.push(spyOn(config, "readConfig").mockReturnValue(mockConfig));
@@ -111,7 +109,6 @@ describe("schedule commands", () => {
 
       const mockResult: ScheduleListResult = {
         scheduled_posts: [],
-        count: 0,
       };
 
       configSpies.push(spyOn(config, "readConfig").mockReturnValue(mockConfig));
@@ -140,7 +137,6 @@ describe("schedule commands", () => {
 
       const mockResult: ScheduleListResult = {
         scheduled_posts: [],
-        count: 0,
       };
 
       configSpies.push(spyOn(config, "readConfig").mockReturnValue(mockConfig));
@@ -158,7 +154,7 @@ describe("schedule commands", () => {
       await scheduleList([], { json: true, pretty: false, verbose: false });
 
       expect(consoleLogSpy).toHaveBeenCalledWith(
-        expect.stringContaining('"count": 0')
+        expect.stringContaining('"scheduled_posts"')
       );
       consoleLogSpy.mockRestore();
     });
@@ -277,7 +273,7 @@ describe("schedule commands", () => {
       );
 
       expect(mockModifyScheduledPost).toHaveBeenCalledWith("job-123", {
-        schedule: futureDateISO,
+        scheduled_date: futureDateISO,
       });
       expect(consoleLogSpy).toHaveBeenCalled();
       consoleLogSpy.mockRestore();
@@ -343,7 +339,7 @@ describe("schedule commands", () => {
       );
 
       expect(mockModifyScheduledPost).toHaveBeenCalledWith("job-123", {
-        schedule: futureDateISO,
+        scheduled_date: futureDateISO,
         title: "Updated Title",
         timezone: "America/New_York",
       });

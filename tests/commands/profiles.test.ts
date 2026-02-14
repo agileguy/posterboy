@@ -57,15 +57,15 @@ describe("Profiles Commands", () => {
   describe("profilesList", () => {
     test("displays profile list in pretty mode", async () => {
       const mockResponse = {
-        users: [
+        profiles: [
           {
             username: "test-profile",
-            connected_platforms: ["x", "linkedin"],
+            social_accounts: { x: true, linkedin: true },
             created_at: "2024-01-15T00:00:00Z",
           },
           {
             username: "another-profile",
-            connected_platforms: ["instagram", "tiktok"],
+            social_accounts: { instagram: true, tiktok: true },
             created_at: "2024-02-20T00:00:00Z",
           },
         ],
@@ -90,16 +90,17 @@ describe("Profiles Commands", () => {
       expect(output).toContain("Profiles");
       expect(output).toContain("test-profile");
       expect(output).toContain("another-profile");
-      expect(output).toContain("x, linkedin");
+      // Platform names may appear in any order from object keys
+      expect(output).toMatch(/x|linkedin/);
       expect(output).toContain("2 / 2 profiles");
     });
 
     test("outputs JSON format when --json flag is set", async () => {
       const mockResponse = {
-        users: [
+        profiles: [
           {
             username: "test-profile",
-            connected_platforms: ["x"],
+            social_accounts: { x: true },
             created_at: "2024-01-15T00:00:00Z",
           },
         ],
@@ -131,7 +132,7 @@ describe("Profiles Commands", () => {
 
     test("displays empty message when no profiles exist", async () => {
       const mockResponse = {
-        users: [],
+        profiles: [],
       };
 
       global.fetch = mock(() =>

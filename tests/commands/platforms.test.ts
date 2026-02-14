@@ -55,9 +55,9 @@ describe("Platforms Commands", () => {
   describe("platforms", () => {
     test("displays platform list in pretty mode", async () => {
       const mockResponse = {
-        user: {
+        profile: {
           username: "test-profile",
-          connected_platforms: ["x", "linkedin", "instagram"],
+          social_accounts: { x: true, linkedin: true, instagram: true },
           created_at: "2024-01-15T00:00:00Z",
         },
       };
@@ -84,9 +84,9 @@ describe("Platforms Commands", () => {
 
     test("outputs JSON format when --json flag is set", async () => {
       const mockResponse = {
-        user: {
+        profile: {
           username: "test-profile",
-          connected_platforms: ["x", "linkedin"],
+          social_accounts: { x: true, linkedin: true },
           created_at: "2024-01-15T00:00:00Z",
         },
       };
@@ -135,9 +135,9 @@ describe("Platforms Commands", () => {
 
     test("uses --profile flag when provided", async () => {
       const mockResponse = {
-        user: {
+        profile: {
           username: "custom-profile",
-          connected_platforms: ["facebook"],
+          social_accounts: { facebook: true },
           created_at: "2024-01-15T00:00:00Z",
         },
       };

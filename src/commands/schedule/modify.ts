@@ -20,6 +20,7 @@ export async function scheduleModify(
       schedule: { type: "string" },
       title: { type: "string" },
       timezone: { type: "string" },
+      caption: { type: "string" },
     },
     strict: false,
   });
@@ -40,7 +41,7 @@ export async function scheduleModify(
   if (values.schedule) {
     const scheduleDate = values.schedule as string;
     validateISODate(scheduleDate);
-    updates.schedule = scheduleDate;
+    updates.scheduled_date = scheduleDate;
   }
 
   if (values.title) {
@@ -53,11 +54,15 @@ export async function scheduleModify(
     updates.timezone = tz;
   }
 
+  if (values.caption) {
+    updates.caption = values.caption as string;
+  }
+
   // Validate that at least one update is provided
   if (Object.keys(updates).length === 0) {
     throw new UserError(
       "At least one update required.\n" +
-      "Provide one of: --schedule, --title, or --timezone"
+      "Provide one of: --schedule, --title, --timezone, or --caption"
     );
   }
 

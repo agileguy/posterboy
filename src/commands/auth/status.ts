@@ -30,15 +30,12 @@ export async function authStatus(
     formatter.json({
       email: accountInfo.email,
       plan: accountInfo.plan,
-      usage: accountInfo.usage,
     });
   } else {
-    const usage = accountInfo.usage;
     formatter.pretty([
       formatter.header("Account Status"),
       `  ${formatter.label("Email:")}     ${accountInfo.email}`,
       `  ${formatter.label("Plan:")}      ${accountInfo.plan}`,
-      `  ${formatter.label("Usage:")}     ${usage.count} / ${usage.limit} uploads this month (${usage.remaining} remaining)`,
     ]);
   }
 }
