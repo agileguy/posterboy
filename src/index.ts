@@ -24,8 +24,10 @@ import { queuePreview } from "./commands/queue/preview";
 import { queueNext } from "./commands/queue/next";
 import { history } from "./commands/history";
 import { analytics } from "./commands/analytics";
+import { completions } from "./commands/completions";
 import { createOutputFormatter } from "./lib/output";
 import { PosterBoyError, suggestFix } from "./lib/errors";
+import { suggestCommand } from "./lib/suggestions";
 import type { GlobalFlags } from "./lib/types";
 
 const HELP_TEXT = `posterboy - Social media posting CLI
@@ -83,15 +85,29 @@ COMMANDS:
 
   analytics           View profile analytics
 
+  completions         Generate shell completions
+    bash              Generate bash completion script
+    zsh               Generate zsh completion script
+    fish              Generate fish completion script
+
 EXAMPLES:
   posterboy auth login --key up_xxxx
   posterboy auth status
   posterboy post text --body "Hello!" --platforms x,linkedin
   posterboy post photo --files photo.jpg --title "My photo" --platforms instagram
   posterboy history
+  posterboy completions bash > /etc/bash_completion.d/posterboy
 `;
 
 async function main() {
+  // Handle EPIPE errors (e.g., when piping to head)
+  process.stdout.on("error", (err) => {
+    const nodeErr = err as { code?: string };
+    if (nodeErr.code === "EPIPE") {
+      process.exit(0);
+    }
+  });
+
   const args = Bun.argv.slice(2);
 
   // Handle --version and --help at the top level
@@ -172,11 +188,19 @@ async function main() {
         await handleAnalyticsCommand(subcommand, remainingArgs, globalFlags);
         break;
 
-      default:
+      case "completions":
+        await completions(remainingArgs, globalFlags);
+        break;
+
+      default: {
+        const suggestion = suggestCommand(command);
         console.error(`Unknown command: ${command}`);
+        if (suggestion) {
+          console.error(`Did you mean '${suggestion}'?`);
+        }
         console.error("Run 'posterboy --help' for usage information");
         process.exit(1);
-        break;
+      }
     }
   } catch (error) {
     await handleError(error);
