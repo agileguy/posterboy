@@ -256,7 +256,7 @@ export interface DocumentPostParams {
 export interface ScheduledPost {
   job_id: string;
   scheduled_date: string;
-  platforms: string[];
+  platforms: Platform[];
   title?: string;
   content_type: string;
   profile: string;
