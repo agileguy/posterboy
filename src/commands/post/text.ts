@@ -5,7 +5,7 @@ import { readConfig, getApiKey, getDefaultProfile } from "../../lib/config";
 import { ApiClient } from "../../lib/api";
 import { createOutputFormatter } from "../../lib/output";
 import { UserError } from "../../lib/errors";
-import { validatePlatforms, validateMutuallyExclusive, validateISODate, validateTimezone } from "../../lib/validation";
+import { validatePlatforms, validateISODate, validateTimezone } from "../../lib/validation";
 import {
   validateContentTypeForPlatforms,
   validatePlatformRequirements,
