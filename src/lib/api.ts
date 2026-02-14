@@ -21,6 +21,7 @@ import type {
   QueueSettingsUpdate,
   QueueSlot,
   HistoryEntry,
+  ScheduleUpdate,
 } from "./types";
 
 export class ApiClient {
@@ -516,15 +517,9 @@ export class ApiClient {
 
   async modifyScheduledPost(
     jobId: string,
-    updates: { schedule?: string; title?: string; caption?: string; timezone?: string }
+    updates: ScheduleUpdate
   ): Promise<{ success: boolean }> {
-    // Map schedule to scheduled_date
-    const body: Record<string, unknown> = {};
-    if (updates.schedule) body.scheduled_date = updates.schedule;
-    if (updates.title) body.title = updates.title;
-    if (updates.caption) body.caption = updates.caption;
-    if (updates.timezone) body.timezone = updates.timezone;
-    return this.request<{ success: boolean }>("PATCH", `/uploadposts/schedule/${jobId}`, body);
+    return this.request<{ success: boolean }>("PATCH", `/uploadposts/schedule/${jobId}`, updates);
   }
 
   // Queue Management
