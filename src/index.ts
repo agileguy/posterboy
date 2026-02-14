@@ -12,6 +12,8 @@ import { profilesDelete } from "./commands/profiles/delete";
 import { profilesConnect } from "./commands/profiles/connect";
 import { platforms, platformsPages } from "./commands/platforms";
 import { postText } from "./commands/post/text";
+import { postVideo } from "./commands/post/video";
+import { statusCheck } from "./commands/status";
 import { createOutputFormatter } from "./lib/output";
 import { PosterBoyError } from "./lib/errors";
 import type { GlobalFlags } from "./lib/types";
@@ -140,8 +142,11 @@ async function main() {
         await handlePostCommand(subcommand, remainingArgs, globalFlags);
         break;
 
-      case "schedule":
       case "status":
+        await handleStatusCommand(subcommand, remainingArgs, globalFlags);
+        break;
+
+      case "schedule":
       case "history":
       case "queue":
       case "analytics":
@@ -249,8 +254,10 @@ async function handlePostCommand(
     case "text":
       await postText(args, globalFlags);
       break;
-    case "photo":
     case "video":
+      await postVideo(args, globalFlags);
+      break;
+    case "photo":
     case "document":
       console.error(`Post subcommand '${subcommand}' not implemented yet`);
       process.exit(1);
@@ -261,6 +268,16 @@ async function handlePostCommand(
       process.exit(1);
       break;
   }
+}
+
+async function handleStatusCommand(
+  subcommand: string | undefined,
+  args: string[],
+  globalFlags: GlobalFlags
+): Promise<void> {
+  // The subcommand IS the ID for status
+  const allArgs = subcommand ? [subcommand, ...args] : args;
+  await statusCheck(allArgs, globalFlags);
 }
 
 async function handleError(error: unknown): Promise<void> {
