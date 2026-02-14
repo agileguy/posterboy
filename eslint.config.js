@@ -22,6 +22,7 @@ export default [
         AbortController: "readonly",
         setTimeout: "readonly",
         clearTimeout: "readonly",
+        FormData: "readonly",
       },
     },
     plugins: {

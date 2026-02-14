@@ -5,16 +5,15 @@ import * as api from "../../src/lib/api";
 import type { PostResult, Config } from "../../src/lib/types";
 import { UserError } from "../../src/lib/errors";
 
-// Store original Bun methods
-const originalFile = Bun.file;
-
 describe("postPhoto command", () => {
   // Track spies for cleanup
   let apiClientSpy: ReturnType<typeof spyOn> | null = null;
+  let configSpies: ReturnType<typeof spyOn>[] = [];
 
   beforeEach(() => {
     // Mock Bun.file to simulate file existence and properties
-    spyOn(Bun, "file").mockImplementation((path: string | URL) => {
+    configSpies.push(
+      spyOn(Bun, "file").mockImplementation((path: string | URL) => {
       const pathStr = typeof path === "string" ? path : path.toString();
 
       if (pathStr === "/test/photo1.jpg" || pathStr === "/test/photo2.png") {
@@ -47,7 +46,8 @@ describe("postPhoto command", () => {
         size: 0,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } as any;
-    });
+    })
+    );
   });
 
   afterEach(() => {
@@ -56,6 +56,9 @@ describe("postPhoto command", () => {
       apiClientSpy.mockRestore();
       apiClientSpy = null;
     }
+    // Restore all config and Bun.file spies
+    configSpies.forEach(spy => spy.mockRestore());
+    configSpies = [];
   });
 
   test("posts single photo from --files flag", async () => {
@@ -73,9 +76,11 @@ describe("postPhoto command", () => {
       usage: { count: 1, limit: 10, remaining: 9 },
     };
 
-    spyOn(config, "readConfig").mockReturnValue(mockConfig);
-    spyOn(config, "getApiKey").mockReturnValue("test_key");
-    spyOn(config, "getDefaultProfile").mockReturnValue("testuser");
+    configSpies.push(
+      spyOn(config, "readConfig").mockReturnValue(mockConfig),
+      spyOn(config, "getApiKey").mockReturnValue("test_key"),
+      spyOn(config, "getDefaultProfile").mockReturnValue("testuser")
+    );
 
     const mockPostPhotos = mock(async () => mockResult);
     apiClientSpy = spyOn(api, "ApiClient").mockImplementation(() => ({
@@ -117,9 +122,11 @@ describe("postPhoto command", () => {
       },
     };
 
-    spyOn(config, "readConfig").mockReturnValue(mockConfig);
-    spyOn(config, "getApiKey").mockReturnValue("test_key");
-    spyOn(config, "getDefaultProfile").mockReturnValue("testuser");
+    configSpies.push(
+      spyOn(config, "readConfig").mockReturnValue(mockConfig),
+      spyOn(config, "getApiKey").mockReturnValue("test_key"),
+      spyOn(config, "getDefaultProfile").mockReturnValue("testuser")
+    );
 
     const mockPostPhotos = mock(async () => mockResult);
     apiClientSpy = spyOn(api, "ApiClient").mockImplementation(() => ({
@@ -162,9 +169,11 @@ describe("postPhoto command", () => {
       },
     };
 
-    spyOn(config, "readConfig").mockReturnValue(mockConfig);
-    spyOn(config, "getApiKey").mockReturnValue("test_key");
-    spyOn(config, "getDefaultProfile").mockReturnValue("testuser");
+    configSpies.push(
+      spyOn(config, "readConfig").mockReturnValue(mockConfig),
+      spyOn(config, "getApiKey").mockReturnValue("test_key"),
+      spyOn(config, "getDefaultProfile").mockReturnValue("testuser")
+    );
 
     const mockPostPhotos = mock(async () => mockResult);
     apiClientSpy = spyOn(api, "ApiClient").mockImplementation(() => ({
@@ -200,9 +209,11 @@ describe("postPhoto command", () => {
       default_profile: "testuser",
     };
 
-    spyOn(config, "readConfig").mockReturnValue(mockConfig);
-    spyOn(config, "getApiKey").mockReturnValue("test_key");
-    spyOn(config, "getDefaultProfile").mockReturnValue("testuser");
+    configSpies.push(
+      spyOn(config, "readConfig").mockReturnValue(mockConfig),
+      spyOn(config, "getApiKey").mockReturnValue("test_key"),
+      spyOn(config, "getDefaultProfile").mockReturnValue("testuser")
+    );
 
     await expect(
       postPhoto(
@@ -219,9 +230,11 @@ describe("postPhoto command", () => {
       default_profile: "testuser",
     };
 
-    spyOn(config, "readConfig").mockReturnValue(mockConfig);
-    spyOn(config, "getApiKey").mockReturnValue("test_key");
-    spyOn(config, "getDefaultProfile").mockReturnValue("testuser");
+    configSpies.push(
+      spyOn(config, "readConfig").mockReturnValue(mockConfig),
+      spyOn(config, "getApiKey").mockReturnValue("test_key"),
+      spyOn(config, "getDefaultProfile").mockReturnValue("testuser")
+    );
 
     await expect(
       postPhoto(
@@ -243,9 +256,11 @@ describe("postPhoto command", () => {
       default_profile: "testuser",
     };
 
-    spyOn(config, "readConfig").mockReturnValue(mockConfig);
-    spyOn(config, "getApiKey").mockReturnValue("test_key");
-    spyOn(config, "getDefaultProfile").mockReturnValue("testuser");
+    configSpies.push(
+      spyOn(config, "readConfig").mockReturnValue(mockConfig),
+      spyOn(config, "getApiKey").mockReturnValue("test_key"),
+      spyOn(config, "getDefaultProfile").mockReturnValue("testuser")
+    );
 
     await expect(
       postPhoto(
@@ -262,9 +277,11 @@ describe("postPhoto command", () => {
       default_profile: "testuser",
     };
 
-    spyOn(config, "readConfig").mockReturnValue(mockConfig);
-    spyOn(config, "getApiKey").mockReturnValue("test_key");
-    spyOn(config, "getDefaultProfile").mockReturnValue("testuser");
+    configSpies.push(
+      spyOn(config, "readConfig").mockReturnValue(mockConfig),
+      spyOn(config, "getApiKey").mockReturnValue("test_key"),
+      spyOn(config, "getDefaultProfile").mockReturnValue("testuser")
+    );
 
     await expect(
       postPhoto(
@@ -281,9 +298,11 @@ describe("postPhoto command", () => {
       default_profile: "testuser",
     };
 
-    spyOn(config, "readConfig").mockReturnValue(mockConfig);
-    spyOn(config, "getApiKey").mockReturnValue("test_key");
-    spyOn(config, "getDefaultProfile").mockReturnValue("testuser");
+    configSpies.push(
+      spyOn(config, "readConfig").mockReturnValue(mockConfig),
+      spyOn(config, "getApiKey").mockReturnValue("test_key"),
+      spyOn(config, "getDefaultProfile").mockReturnValue("testuser")
+    );
 
     const mockPostPhotos = mock(async () => ({} as PostResult));
     apiClientSpy = spyOn(api, "ApiClient").mockImplementation(() => ({
@@ -323,9 +342,11 @@ describe("postPhoto command", () => {
       },
     };
 
-    spyOn(config, "readConfig").mockReturnValue(mockConfig);
-    spyOn(config, "getApiKey").mockReturnValue("test_key");
-    spyOn(config, "getDefaultProfile").mockReturnValue("testuser");
+    configSpies.push(
+      spyOn(config, "readConfig").mockReturnValue(mockConfig),
+      spyOn(config, "getApiKey").mockReturnValue("test_key"),
+      spyOn(config, "getDefaultProfile").mockReturnValue("testuser")
+    );
 
     const mockPostPhotos = mock(async () => mockResult);
     apiClientSpy = spyOn(api, "ApiClient").mockImplementation(() => ({
@@ -361,9 +382,11 @@ describe("postPhoto command", () => {
       },
     };
 
-    spyOn(config, "readConfig").mockReturnValue(mockConfig);
-    spyOn(config, "getApiKey").mockReturnValue("test_key");
-    spyOn(config, "getDefaultProfile").mockReturnValue("testuser");
+    configSpies.push(
+      spyOn(config, "readConfig").mockReturnValue(mockConfig),
+      spyOn(config, "getApiKey").mockReturnValue("test_key"),
+      spyOn(config, "getDefaultProfile").mockReturnValue("testuser")
+    );
 
     const mockPostPhotos = mock(async () => mockResult);
     apiClientSpy = spyOn(api, "ApiClient").mockImplementation(() => ({
@@ -407,9 +430,11 @@ describe("postPhoto command", () => {
       default_profile: "testuser",
     };
 
-    spyOn(config, "readConfig").mockReturnValue(mockConfig);
-    spyOn(config, "getApiKey").mockReturnValue("test_key");
-    spyOn(config, "getDefaultProfile").mockReturnValue("testuser");
+    configSpies.push(
+      spyOn(config, "readConfig").mockReturnValue(mockConfig),
+      spyOn(config, "getApiKey").mockReturnValue("test_key"),
+      spyOn(config, "getDefaultProfile").mockReturnValue("testuser")
+    );
 
     await expect(
       postPhoto(
@@ -426,9 +451,11 @@ describe("postPhoto command", () => {
       default_profile: "testuser",
     };
 
-    spyOn(config, "readConfig").mockReturnValue(mockConfig);
-    spyOn(config, "getApiKey").mockReturnValue("test_key");
-    spyOn(config, "getDefaultProfile").mockReturnValue("testuser");
+    configSpies.push(
+      spyOn(config, "readConfig").mockReturnValue(mockConfig),
+      spyOn(config, "getApiKey").mockReturnValue("test_key"),
+      spyOn(config, "getDefaultProfile").mockReturnValue("testuser")
+    );
 
     await expect(
       postPhoto(
@@ -445,9 +472,11 @@ describe("postPhoto command", () => {
       default_profile: "testuser",
     };
 
-    spyOn(config, "readConfig").mockReturnValue(mockConfig);
-    spyOn(config, "getApiKey").mockReturnValue("test_key");
-    spyOn(config, "getDefaultProfile").mockReturnValue("testuser");
+    configSpies.push(
+      spyOn(config, "readConfig").mockReturnValue(mockConfig),
+      spyOn(config, "getApiKey").mockReturnValue("test_key"),
+      spyOn(config, "getDefaultProfile").mockReturnValue("testuser")
+    );
 
     await expect(
       postPhoto(

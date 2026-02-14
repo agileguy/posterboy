@@ -1,4 +1,4 @@
-import { describe, test, expect, beforeEach, afterEach, mock, spyOn } from "bun:test";
+import { describe, test, expect, afterEach, mock, spyOn } from "bun:test";
 import { statusCheck } from "../../src/commands/status";
 import * as config from "../../src/lib/config";
 import * as api from "../../src/lib/api";
@@ -8,6 +8,7 @@ import { UserError } from "../../src/lib/errors";
 describe("statusCheck command", () => {
   // Track spies for cleanup
   let apiClientSpy: ReturnType<typeof spyOn> | null = null;
+  let configSpies: ReturnType<typeof spyOn>[] = [];
 
   afterEach(() => {
     // Restore ApiClient spy to prevent leaking to other test files
@@ -15,6 +16,9 @@ describe("statusCheck command", () => {
       apiClientSpy.mockRestore();
       apiClientSpy = null;
     }
+    // Restore all config spies
+    configSpies.forEach(spy => spy.mockRestore());
+    configSpies = [];
   });
 
   test("shows status for job_id", async () => {
@@ -30,8 +34,10 @@ describe("statusCheck command", () => {
       },
     };
 
-    spyOn(config, "readConfig").mockReturnValue(mockConfig);
-    spyOn(config, "getApiKey").mockReturnValue("test_key");
+    configSpies.push(
+      spyOn(config, "readConfig").mockReturnValue(mockConfig),
+      spyOn(config, "getApiKey").mockReturnValue("test_key")
+    );
 
     const mockGetStatus = mock(async () => mockResult);
     apiClientSpy = spyOn(api, "ApiClient").mockImplementation(() => ({
@@ -61,8 +67,10 @@ describe("statusCheck command", () => {
       status: "pending",
     };
 
-    spyOn(config, "readConfig").mockReturnValue(mockConfig);
-    spyOn(config, "getApiKey").mockReturnValue("test_key");
+    configSpies.push(
+      spyOn(config, "readConfig").mockReturnValue(mockConfig),
+      spyOn(config, "getApiKey").mockReturnValue("test_key")
+    );
 
     const mockGetStatus = mock(async () => mockResult);
     apiClientSpy = spyOn(api, "ApiClient").mockImplementation(() => ({
@@ -91,8 +99,10 @@ describe("statusCheck command", () => {
       status: "processing",
     };
 
-    spyOn(config, "readConfig").mockReturnValue(mockConfig);
-    spyOn(config, "getApiKey").mockReturnValue("test_key");
+    configSpies.push(
+      spyOn(config, "readConfig").mockReturnValue(mockConfig),
+      spyOn(config, "getApiKey").mockReturnValue("test_key")
+    );
 
     const mockGetStatus = mock(async () => mockResult);
     apiClientSpy = spyOn(api, "ApiClient").mockImplementation(() => ({
@@ -124,8 +134,10 @@ describe("statusCheck command", () => {
       },
     };
 
-    spyOn(config, "readConfig").mockReturnValue(mockConfig);
-    spyOn(config, "getApiKey").mockReturnValue("test_key");
+    configSpies.push(
+      spyOn(config, "readConfig").mockReturnValue(mockConfig),
+      spyOn(config, "getApiKey").mockReturnValue("test_key")
+    );
 
     const mockGetStatus = mock(async () => mockResult);
     apiClientSpy = spyOn(api, "ApiClient").mockImplementation(() => ({
@@ -152,8 +164,10 @@ describe("statusCheck command", () => {
       api_key: "test_key",
     };
 
-    spyOn(config, "readConfig").mockReturnValue(mockConfig);
-    spyOn(config, "getApiKey").mockReturnValue("test_key");
+    configSpies.push(
+      spyOn(config, "readConfig").mockReturnValue(mockConfig),
+      spyOn(config, "getApiKey").mockReturnValue("test_key")
+    );
 
     await expect(
       statusCheck(

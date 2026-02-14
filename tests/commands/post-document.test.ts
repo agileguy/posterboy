@@ -8,10 +8,12 @@ import { UserError } from "../../src/lib/errors";
 describe("postDocument command", () => {
   // Track spies for cleanup
   let apiClientSpy: ReturnType<typeof spyOn> | null = null;
+  let configSpies: ReturnType<typeof spyOn>[] = [];
 
   beforeEach(() => {
     // Mock Bun.file to simulate file existence and properties
-    spyOn(Bun, "file").mockImplementation((path: string | URL) => {
+    configSpies.push(
+      spyOn(Bun, "file").mockImplementation((path: string | URL) => {
       const pathStr = typeof path === "string" ? path : path.toString();
 
       if (pathStr === "/test/presentation.pdf") {
@@ -52,7 +54,8 @@ describe("postDocument command", () => {
         size: 0,
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } as any;
-    });
+    })
+    );
   });
 
   afterEach(() => {
@@ -61,6 +64,9 @@ describe("postDocument command", () => {
       apiClientSpy.mockRestore();
       apiClientSpy = null;
     }
+    // Restore all config and Bun.file spies
+    configSpies.forEach(spy => spy.mockRestore());
+    configSpies = [];
   });
 
   test("posts document from --file flag", async () => {
@@ -78,9 +84,11 @@ describe("postDocument command", () => {
       usage: { count: 1, limit: 10, remaining: 9 },
     };
 
-    spyOn(config, "readConfig").mockReturnValue(mockConfig);
-    spyOn(config, "getApiKey").mockReturnValue("test_key");
-    spyOn(config, "getDefaultProfile").mockReturnValue("testuser");
+    configSpies.push(
+      spyOn(config, "readConfig").mockReturnValue(mockConfig),
+      spyOn(config, "getApiKey").mockReturnValue("test_key"),
+      spyOn(config, "getDefaultProfile").mockReturnValue("testuser")
+    );
 
     const mockPostDocument = mock(async () => mockResult);
     apiClientSpy = spyOn(api, "ApiClient").mockImplementation(() => ({
@@ -121,9 +129,11 @@ describe("postDocument command", () => {
       },
     };
 
-    spyOn(config, "readConfig").mockReturnValue(mockConfig);
-    spyOn(config, "getApiKey").mockReturnValue("test_key");
-    spyOn(config, "getDefaultProfile").mockReturnValue("testuser");
+    configSpies.push(
+      spyOn(config, "readConfig").mockReturnValue(mockConfig),
+      spyOn(config, "getApiKey").mockReturnValue("test_key"),
+      spyOn(config, "getDefaultProfile").mockReturnValue("testuser")
+    );
 
     const mockPostDocument = mock(async () => mockResult);
     apiClientSpy = spyOn(api, "ApiClient").mockImplementation(() => ({
@@ -160,9 +170,11 @@ describe("postDocument command", () => {
       default_profile: "testuser",
     };
 
-    spyOn(config, "readConfig").mockReturnValue(mockConfig);
-    spyOn(config, "getApiKey").mockReturnValue("test_key");
-    spyOn(config, "getDefaultProfile").mockReturnValue("testuser");
+    configSpies.push(
+      spyOn(config, "readConfig").mockReturnValue(mockConfig),
+      spyOn(config, "getApiKey").mockReturnValue("test_key"),
+      spyOn(config, "getDefaultProfile").mockReturnValue("testuser")
+    );
 
     await expect(
       postDocument(
@@ -179,9 +191,11 @@ describe("postDocument command", () => {
       default_profile: "testuser",
     };
 
-    spyOn(config, "readConfig").mockReturnValue(mockConfig);
-    spyOn(config, "getApiKey").mockReturnValue("test_key");
-    spyOn(config, "getDefaultProfile").mockReturnValue("testuser");
+    configSpies.push(
+      spyOn(config, "readConfig").mockReturnValue(mockConfig),
+      spyOn(config, "getApiKey").mockReturnValue("test_key"),
+      spyOn(config, "getDefaultProfile").mockReturnValue("testuser")
+    );
 
     await expect(
       postDocument(
@@ -198,9 +212,11 @@ describe("postDocument command", () => {
       default_profile: "testuser",
     };
 
-    spyOn(config, "readConfig").mockReturnValue(mockConfig);
-    spyOn(config, "getApiKey").mockReturnValue("test_key");
-    spyOn(config, "getDefaultProfile").mockReturnValue("testuser");
+    configSpies.push(
+      spyOn(config, "readConfig").mockReturnValue(mockConfig),
+      spyOn(config, "getApiKey").mockReturnValue("test_key"),
+      spyOn(config, "getDefaultProfile").mockReturnValue("testuser")
+    );
 
     const mockPostDocument = mock(async () => ({} as PostResult));
     apiClientSpy = spyOn(api, "ApiClient").mockImplementation(() => ({
@@ -239,9 +255,11 @@ describe("postDocument command", () => {
       },
     };
 
-    spyOn(config, "readConfig").mockReturnValue(mockConfig);
-    spyOn(config, "getApiKey").mockReturnValue("test_key");
-    spyOn(config, "getDefaultProfile").mockReturnValue("testuser");
+    configSpies.push(
+      spyOn(config, "readConfig").mockReturnValue(mockConfig),
+      spyOn(config, "getApiKey").mockReturnValue("test_key"),
+      spyOn(config, "getDefaultProfile").mockReturnValue("testuser")
+    );
 
     const mockPostDocument = mock(async () => mockResult);
     apiClientSpy = spyOn(api, "ApiClient").mockImplementation(() => ({
@@ -276,9 +294,11 @@ describe("postDocument command", () => {
       },
     };
 
-    spyOn(config, "readConfig").mockReturnValue(mockConfig);
-    spyOn(config, "getApiKey").mockReturnValue("test_key");
-    spyOn(config, "getDefaultProfile").mockReturnValue("testuser");
+    configSpies.push(
+      spyOn(config, "readConfig").mockReturnValue(mockConfig),
+      spyOn(config, "getApiKey").mockReturnValue("test_key"),
+      spyOn(config, "getDefaultProfile").mockReturnValue("testuser")
+    );
 
     const mockPostDocument = mock(async () => mockResult);
     apiClientSpy = spyOn(api, "ApiClient").mockImplementation(() => ({
@@ -315,9 +335,11 @@ describe("postDocument command", () => {
       default_profile: "testuser",
     };
 
-    spyOn(config, "readConfig").mockReturnValue(mockConfig);
-    spyOn(config, "getApiKey").mockReturnValue("test_key");
-    spyOn(config, "getDefaultProfile").mockReturnValue("testuser");
+    configSpies.push(
+      spyOn(config, "readConfig").mockReturnValue(mockConfig),
+      spyOn(config, "getApiKey").mockReturnValue("test_key"),
+      spyOn(config, "getDefaultProfile").mockReturnValue("testuser")
+    );
 
     await expect(
       postDocument(
@@ -334,9 +356,11 @@ describe("postDocument command", () => {
       default_profile: "testuser",
     };
 
-    spyOn(config, "readConfig").mockReturnValue(mockConfig);
-    spyOn(config, "getApiKey").mockReturnValue("test_key");
-    spyOn(config, "getDefaultProfile").mockReturnValue("testuser");
+    configSpies.push(
+      spyOn(config, "readConfig").mockReturnValue(mockConfig),
+      spyOn(config, "getApiKey").mockReturnValue("test_key"),
+      spyOn(config, "getDefaultProfile").mockReturnValue("testuser")
+    );
 
     await expect(
       postDocument(
@@ -353,9 +377,11 @@ describe("postDocument command", () => {
       default_profile: "testuser",
     };
 
-    spyOn(config, "readConfig").mockReturnValue(mockConfig);
-    spyOn(config, "getApiKey").mockReturnValue("test_key");
-    spyOn(config, "getDefaultProfile").mockReturnValue("testuser");
+    configSpies.push(
+      spyOn(config, "readConfig").mockReturnValue(mockConfig),
+      spyOn(config, "getApiKey").mockReturnValue("test_key"),
+      spyOn(config, "getDefaultProfile").mockReturnValue("testuser")
+    );
 
     await expect(
       postDocument(
@@ -385,9 +411,11 @@ describe("postDocument command", () => {
       },
     };
 
-    spyOn(config, "readConfig").mockReturnValue(mockConfig);
-    spyOn(config, "getApiKey").mockReturnValue("test_key");
-    spyOn(config, "getDefaultProfile").mockReturnValue("testuser");
+    configSpies.push(
+      spyOn(config, "readConfig").mockReturnValue(mockConfig),
+      spyOn(config, "getApiKey").mockReturnValue("test_key"),
+      spyOn(config, "getDefaultProfile").mockReturnValue("testuser")
+    );
 
     const mockPostDocument = mock(async () => mockResult);
     apiClientSpy = spyOn(api, "ApiClient").mockImplementation(() => ({

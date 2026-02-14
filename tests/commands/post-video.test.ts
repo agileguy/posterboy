@@ -12,6 +12,7 @@ describe("postVideo command", () => {
   // Track spies for cleanup
   let apiClientSpy: ReturnType<typeof spyOn> | null = null;
   let bunFileSpy: ReturnType<typeof spyOn> | null = null;
+  let configSpies: ReturnType<typeof spyOn>[] = [];
 
   beforeEach(() => {
     // Mock Bun.file for video files
@@ -45,6 +46,9 @@ describe("postVideo command", () => {
       bunFileSpy.mockRestore();
       bunFileSpy = null;
     }
+    // Restore all config spies
+    configSpies.forEach(spy => spy.mockRestore());
+    configSpies = [];
   });
 
   test("posts video from --file flag", async () => {
@@ -62,9 +66,11 @@ describe("postVideo command", () => {
       usage: { count: 1, limit: 10, remaining: 9 },
     };
 
-    spyOn(config, "readConfig").mockReturnValue(mockConfig);
-    spyOn(config, "getApiKey").mockReturnValue("test_key");
-    spyOn(config, "getDefaultProfile").mockReturnValue("testuser");
+    configSpies.push(
+      spyOn(config, "readConfig").mockReturnValue(mockConfig),
+      spyOn(config, "getApiKey").mockReturnValue("test_key"),
+      spyOn(config, "getDefaultProfile").mockReturnValue("testuser")
+    );
 
     const mockPostVideo = mock(async () => mockResult);
     apiClientSpy = spyOn(api, "ApiClient").mockImplementation(() => ({
@@ -106,9 +112,11 @@ describe("postVideo command", () => {
       },
     };
 
-    spyOn(config, "readConfig").mockReturnValue(mockConfig);
-    spyOn(config, "getApiKey").mockReturnValue("test_key");
-    spyOn(config, "getDefaultProfile").mockReturnValue("testuser");
+    configSpies.push(
+      spyOn(config, "readConfig").mockReturnValue(mockConfig),
+      spyOn(config, "getApiKey").mockReturnValue("test_key"),
+      spyOn(config, "getDefaultProfile").mockReturnValue("testuser")
+    );
 
     const mockPostVideo = mock(async () => mockResult);
     apiClientSpy = spyOn(api, "ApiClient").mockImplementation(() => ({
@@ -142,9 +150,11 @@ describe("postVideo command", () => {
       default_profile: "testuser",
     };
 
-    spyOn(config, "readConfig").mockReturnValue(mockConfig);
-    spyOn(config, "getApiKey").mockReturnValue("test_key");
-    spyOn(config, "getDefaultProfile").mockReturnValue("testuser");
+    configSpies.push(
+      spyOn(config, "readConfig").mockReturnValue(mockConfig),
+      spyOn(config, "getApiKey").mockReturnValue("test_key"),
+      spyOn(config, "getDefaultProfile").mockReturnValue("testuser")
+    );
 
     await expect(
       postVideo(
@@ -161,9 +171,11 @@ describe("postVideo command", () => {
       default_profile: "testuser",
     };
 
-    spyOn(config, "readConfig").mockReturnValue(mockConfig);
-    spyOn(config, "getApiKey").mockReturnValue("test_key");
-    spyOn(config, "getDefaultProfile").mockReturnValue("testuser");
+    configSpies.push(
+      spyOn(config, "readConfig").mockReturnValue(mockConfig),
+      spyOn(config, "getApiKey").mockReturnValue("test_key"),
+      spyOn(config, "getDefaultProfile").mockReturnValue("testuser")
+    );
 
     await expect(
       postVideo(
@@ -180,9 +192,11 @@ describe("postVideo command", () => {
       default_profile: "testuser",
     };
 
-    spyOn(config, "readConfig").mockReturnValue(mockConfig);
-    spyOn(config, "getApiKey").mockReturnValue("test_key");
-    spyOn(config, "getDefaultProfile").mockReturnValue("testuser");
+    configSpies.push(
+      spyOn(config, "readConfig").mockReturnValue(mockConfig),
+      spyOn(config, "getApiKey").mockReturnValue("test_key"),
+      spyOn(config, "getDefaultProfile").mockReturnValue("testuser")
+    );
 
     await expect(
       postVideo(
@@ -204,9 +218,11 @@ describe("postVideo command", () => {
       request_id: "req_123",
     };
 
-    spyOn(config, "readConfig").mockReturnValue(mockConfig);
-    spyOn(config, "getApiKey").mockReturnValue("test_key");
-    spyOn(config, "getDefaultProfile").mockReturnValue("testuser");
+    configSpies.push(
+      spyOn(config, "readConfig").mockReturnValue(mockConfig),
+      spyOn(config, "getApiKey").mockReturnValue("test_key"),
+      spyOn(config, "getDefaultProfile").mockReturnValue("testuser")
+    );
 
     const mockPostVideo = mock(async () => mockResult);
     apiClientSpy = spyOn(api, "ApiClient").mockImplementation(() => ({
@@ -237,9 +253,11 @@ describe("postVideo command", () => {
       default_profile: "testuser",
     };
 
-    spyOn(config, "readConfig").mockReturnValue(mockConfig);
-    spyOn(config, "getApiKey").mockReturnValue("test_key");
-    spyOn(config, "getDefaultProfile").mockReturnValue("testuser");
+    configSpies.push(
+      spyOn(config, "readConfig").mockReturnValue(mockConfig),
+      spyOn(config, "getApiKey").mockReturnValue("test_key"),
+      spyOn(config, "getDefaultProfile").mockReturnValue("testuser")
+    );
 
     const mockPostVideo = mock(async () => ({} as PostResult));
     apiClientSpy = spyOn(api, "ApiClient").mockImplementation(() => ({
@@ -274,9 +292,11 @@ describe("postVideo command", () => {
       },
     };
 
-    spyOn(config, "readConfig").mockReturnValue(mockConfig);
-    spyOn(config, "getApiKey").mockReturnValue("test_key");
-    spyOn(config, "getDefaultProfile").mockReturnValue("testuser");
+    configSpies.push(
+      spyOn(config, "readConfig").mockReturnValue(mockConfig),
+      spyOn(config, "getApiKey").mockReturnValue("test_key"),
+      spyOn(config, "getDefaultProfile").mockReturnValue("testuser")
+    );
 
     const mockPostVideo = mock(async () => mockResult);
     apiClientSpy = spyOn(api, "ApiClient").mockImplementation(() => ({
@@ -311,9 +331,11 @@ describe("postVideo command", () => {
       },
     };
 
-    spyOn(config, "readConfig").mockReturnValue(mockConfig);
-    spyOn(config, "getApiKey").mockReturnValue("test_key");
-    spyOn(config, "getDefaultProfile").mockReturnValue("testuser");
+    configSpies.push(
+      spyOn(config, "readConfig").mockReturnValue(mockConfig),
+      spyOn(config, "getApiKey").mockReturnValue("test_key"),
+      spyOn(config, "getDefaultProfile").mockReturnValue("testuser")
+    );
 
     const mockPostVideo = mock(async () => mockResult);
     apiClientSpy = spyOn(api, "ApiClient").mockImplementation(() => ({
@@ -362,9 +384,11 @@ describe("postVideo command", () => {
       },
     };
 
-    spyOn(config, "readConfig").mockReturnValue(mockConfig);
-    spyOn(config, "getApiKey").mockReturnValue("test_key");
-    spyOn(config, "getDefaultProfile").mockReturnValue("testuser");
+    configSpies.push(
+      spyOn(config, "readConfig").mockReturnValue(mockConfig),
+      spyOn(config, "getApiKey").mockReturnValue("test_key"),
+      spyOn(config, "getDefaultProfile").mockReturnValue("testuser")
+    );
 
     const mockPostVideo = mock(async () => mockResult);
     apiClientSpy = spyOn(api, "ApiClient").mockImplementation(() => ({
