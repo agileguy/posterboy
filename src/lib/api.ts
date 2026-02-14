@@ -16,6 +16,10 @@ import type {
   DocumentPostParams,
   PostResult,
   StatusResult,
+  ScheduleListResult,
+  QueueSettings,
+  QueueSettingsUpdate,
+  QueueSlot,
 } from "./types";
 
 export class ApiClient {
@@ -436,5 +440,44 @@ export class ApiClient {
   async getStatus(id: string, type: "request_id" | "job_id" = "request_id"): Promise<StatusResult> {
     const queryParam = type === "job_id" ? `job_id=${id}` : `request_id=${id}`;
     return this.request<StatusResult>("GET", `/uploadposts/status?${queryParam}`);
+  }
+
+  // Schedule Management
+  async listScheduledPosts(profile?: string): Promise<ScheduleListResult> {
+    const queryParam = profile ? `?profile=${encodeURIComponent(profile)}` : "";
+    return this.request<ScheduleListResult>("GET", `/uploadposts/schedule${queryParam}`);
+  }
+
+  async cancelScheduledPost(jobId: string): Promise<{ success: boolean }> {
+    return this.request<{ success: boolean }>("DELETE", `/uploadposts/schedule/${jobId}`);
+  }
+
+  async modifyScheduledPost(
+    jobId: string,
+    updates: { schedule?: string; title?: string; timezone?: string }
+  ): Promise<{ success: boolean }> {
+    return this.request<{ success: boolean }>("PATCH", `/uploadposts/schedule/${jobId}`, updates);
+  }
+
+  // Queue Management
+  async getQueueSettings(profile: string): Promise<QueueSettings> {
+    return this.request<QueueSettings>("GET", `/uploadposts/queue/settings?profile=${encodeURIComponent(profile)}`);
+  }
+
+  async updateQueueSettings(profile: string, updates: QueueSettingsUpdate): Promise<{ success: boolean }> {
+    const body = { profile, ...updates };
+    return this.request<{ success: boolean }>("POST", "/uploadposts/queue/settings", body);
+  }
+
+  async previewQueue(profile: string, count?: number): Promise<{ slots: QueueSlot[] }> {
+    const queryParams = new URLSearchParams({ profile });
+    if (count !== undefined) {
+      queryParams.set("count", count.toString());
+    }
+    return this.request<{ slots: QueueSlot[] }>("GET", `/uploadposts/queue/preview?${queryParams}`);
+  }
+
+  async nextSlot(profile: string): Promise<{ next_slot: string; profile: string }> {
+    return this.request<{ next_slot: string; profile: string }>("GET", `/uploadposts/queue/next-slot?profile=${encodeURIComponent(profile)}`);
   }
 }
