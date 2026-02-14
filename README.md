@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/posterboy-banner.png" alt="posterboy" width="300">
+  <img src="https://raw.githubusercontent.com/agileguy/posterboy/main/assets/posterboy-banner.png" alt="posterboy" width="300">
 </p>
 
 <h1 align="center">posterboy</h1>
