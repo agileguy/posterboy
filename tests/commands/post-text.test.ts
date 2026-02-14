@@ -1,4 +1,4 @@
-import { describe, test, expect, beforeEach, mock, spyOn } from "bun:test";
+import { describe, test, expect, beforeEach, afterEach, mock, spyOn } from "bun:test";
 import { postText } from "../../src/commands/post/text";
 import * as config from "../../src/lib/config";
 import * as api from "../../src/lib/api";
@@ -11,6 +11,8 @@ const originalFile = Bun.file;
 describe("postText command", () => {
   let mockFileText: ReturnType<typeof mock>;
   let mockStdinText: ReturnType<typeof mock>;
+  // Track spies for cleanup
+  let apiClientSpy: ReturnType<typeof spyOn> | null = null;
 
   beforeEach(() => {
     // Reset mocks
@@ -35,6 +37,14 @@ describe("postText command", () => {
     (Bun.stdin as any).text = mockStdinText;
   });
 
+  afterEach(() => {
+    // Restore ApiClient spy to prevent leaking to other test files
+    if (apiClientSpy) {
+      apiClientSpy.mockRestore();
+      apiClientSpy = null;
+    }
+  });
+
   test("posts text from --body flag", async () => {
     const mockConfig: Config = {
       version: 1,
@@ -55,7 +65,7 @@ describe("postText command", () => {
     spyOn(config, "getDefaultProfile").mockReturnValue("testuser");
 
     const mockPostText = mock(async () => mockResult);
-    spyOn(api, "ApiClient").mockImplementation(() => ({
+    apiClientSpy = spyOn(api, "ApiClient").mockImplementation(() => ({
       postText: mockPostText,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     }) as any);
@@ -95,7 +105,7 @@ describe("postText command", () => {
     spyOn(config, "getDefaultProfile").mockReturnValue(undefined);
 
     const mockPostTextFn = mock(async () => mockResult);
-    spyOn(api, "ApiClient").mockImplementation(() => ({
+    apiClientSpy = spyOn(api, "ApiClient").mockImplementation(() => ({
       postText: mockPostTextFn,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     }) as any);
@@ -137,7 +147,7 @@ describe("postText command", () => {
     spyOn(config, "getDefaultProfile").mockReturnValue("testuser");
 
     const mockPostTextFn = mock(async () => mockResult);
-    spyOn(api, "ApiClient").mockImplementation(() => ({
+    apiClientSpy = spyOn(api, "ApiClient").mockImplementation(() => ({
       postText: mockPostTextFn,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     }) as any);
@@ -253,7 +263,7 @@ describe("postText command", () => {
     spyOn(config, "getDefaultProfile").mockReturnValue("testuser");
 
     const mockPostText = mock(async () => ({} as PostResult));
-    spyOn(api, "ApiClient").mockImplementation(() => ({
+    apiClientSpy = spyOn(api, "ApiClient").mockImplementation(() => ({
       postText: mockPostText,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     }) as any);
@@ -291,7 +301,7 @@ describe("postText command", () => {
     spyOn(config, "getDefaultProfile").mockReturnValue("testuser");
 
     const mockPostText = mock(async () => mockResult);
-    spyOn(api, "ApiClient").mockImplementation(() => ({
+    apiClientSpy = spyOn(api, "ApiClient").mockImplementation(() => ({
       postText: mockPostText,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     }) as any);
@@ -328,7 +338,7 @@ describe("postText command", () => {
     spyOn(config, "getDefaultProfile").mockReturnValue("testuser");
 
     const mockPostText = mock(async () => mockResult);
-    spyOn(api, "ApiClient").mockImplementation(() => ({
+    apiClientSpy = spyOn(api, "ApiClient").mockImplementation(() => ({
       postText: mockPostText,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     }) as any);
@@ -370,7 +380,7 @@ describe("postText command", () => {
     spyOn(config, "getDefaultProfile").mockReturnValue("testuser");
 
     const mockPostText = mock(async () => mockResult);
-    spyOn(api, "ApiClient").mockImplementation(() => ({
+    apiClientSpy = spyOn(api, "ApiClient").mockImplementation(() => ({
       postText: mockPostText,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     }) as any);

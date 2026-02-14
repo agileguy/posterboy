@@ -26,8 +26,5 @@ jobs:
       - name: Lint
         run: bun run lint
 
-      - name: Test ApiClient only
-        run: bun test tests/lib/api-client.test.ts
-
       - name: Test
         run: bun test
