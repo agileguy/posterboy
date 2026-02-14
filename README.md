@@ -54,6 +54,10 @@ posterboy post text --body "Scheduled post" --platforms x --schedule "2026-03-01
 
 # Queue a post
 posterboy post text --body "Queued post" --platforms x --queue
+
+# Delete a Bluesky post
+posterboy post delete --url https://bsky.app/profile/user/post/abc123
+posterboy post delete --id abc123 --platform bluesky
 ```
 
 ## Commands
@@ -71,6 +75,7 @@ posterboy post text --body "Queued post" --platforms x --queue
 | `post photo` | Post photos/carousel |
 | `post video` | Post video |
 | `post document` | Post document (LinkedIn) |
+| `post delete` | Delete post (Bluesky only) |
 | `schedule list` | List scheduled posts |
 | `schedule cancel` | Cancel scheduled post |
 | `schedule modify` | Modify scheduled post |
@@ -91,6 +96,50 @@ posterboy post text --body "Queued post" --platforms x --queue
 | `--profile` | Override default profile |
 | `--api-key` | Override API key |
 | `--config` | Override config path |
+
+## Deleting Posts
+
+The `post delete` command allows you to delete published posts. Currently, **only Bluesky is supported** because:
+
+- Publer (the backend API) does not provide a delete endpoint for published posts
+- For Bluesky, posterboy uses the AT Protocol API directly to delete posts
+- For other platforms (X, LinkedIn, Facebook, etc.), you'll need to delete manually
+
+### Requirements
+
+Set Bluesky credentials in `~/.env`:
+
+```bash
+BLUESKY_HANDLE=your-handle.bsky.social
+BLUESKY_APP_PASSWORD=your-app-password
+```
+
+### Usage
+
+```bash
+# Delete by URL
+posterboy post delete --url https://bsky.app/profile/user.bsky.social/post/abc123xyz
+
+# Delete by ID
+posterboy post delete --id abc123xyz --platform bluesky
+
+# Verbose mode shows authentication and deletion steps
+posterboy --verbose post delete --url https://bsky.app/profile/user/post/abc123
+```
+
+### Supported Platforms
+
+| Platform | Delete Support | Why |
+|----------|----------------|-----|
+| Bluesky | ✅ Yes | Direct AT Protocol API access |
+| X (Twitter) | ❌ No | Publer API limitation |
+| LinkedIn | ❌ No | Publer API limitation |
+| Facebook | ❌ No | Publer API limitation |
+| Instagram | ❌ No | Publer API limitation |
+| TikTok | ❌ No | Publer API limitation |
+| YouTube | ❌ No | Publer API limitation |
+
+For unsupported platforms, posterboy will show an error message with the post URL for manual deletion.
 
 ## Configuration
 

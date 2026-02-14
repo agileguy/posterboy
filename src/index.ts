@@ -14,6 +14,7 @@ import { postText } from "./commands/post/text";
 import { postPhoto } from "./commands/post/photo";
 import { postVideo } from "./commands/post/video";
 import { postDocument } from "./commands/post/document";
+import { postDelete } from "./commands/post/delete";
 import { statusCheck } from "./commands/status";
 import { scheduleList } from "./commands/schedule/list";
 import { scheduleCancel } from "./commands/schedule/cancel";
@@ -362,6 +363,7 @@ SUBCOMMANDS:
   photo         Post photo(s) / carousel
   video         Post video content
   document      Post document (LinkedIn only)
+  delete        Delete a post (Bluesky only)
 
 FLAGS:
   --profile     Profile to post from
@@ -388,9 +390,12 @@ FLAGS:
     case "document":
       await postDocument(args, globalFlags);
       break;
+    case "delete":
+      await postDelete(args, globalFlags);
+      break;
     default:
       console.error(`Unknown post subcommand: ${subcommand}`);
-      console.error("Available: text, photo, video, document");
+      console.error("Available: text, photo, video, document, delete");
       process.exit(1);
       break;
   }
