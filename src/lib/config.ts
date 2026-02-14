@@ -3,6 +3,7 @@ import type { Config, Platform } from "./types";
 import { UserError } from "./errors";
 import { mkdirSync, readFileSync, writeFileSync, existsSync } from "node:fs";
 import { chmod } from "node:fs/promises";
+import { dirname } from "node:path";
 
 /**
  * Read configuration from file
@@ -35,24 +36,25 @@ export function readConfig(): Config | null {
  */
 export async function writeConfig(config: Config): Promise<void> {
   const configPath = resolveConfigPath();
-  
+  const configDir = dirname(configPath);
+
   // Ensure config directory exists
-  if (!existsSync(CONFIG_DIR)) {
-    mkdirSync(CONFIG_DIR, { recursive: true, mode: 0o700 });
+  if (!existsSync(configDir)) {
+    mkdirSync(configDir, { recursive: true, mode: 0o700 });
   }
-  
+
   // Validate before writing
   validateConfig(config);
-  
+
   // Write config file
   const content = JSON.stringify(config, null, 2);
   writeFileSync(configPath, content, "utf-8");
-  
+
   // Set restrictive permissions (user-only read/write)
   await chmod(configPath, 0o600);
-  
+
   // Ensure directory has correct permissions too
-  await chmod(CONFIG_DIR, 0o700);
+  await chmod(configDir, 0o700);
 }
 
 /**
