@@ -12,8 +12,16 @@ import { profilesDelete } from "./commands/profiles/delete";
 import { profilesConnect } from "./commands/profiles/connect";
 import { platforms, platformsPages } from "./commands/platforms";
 import { postText } from "./commands/post/text";
+import { postPhoto } from "./commands/post/photo";
 import { postVideo } from "./commands/post/video";
+import { postDocument } from "./commands/post/document";
 import { statusCheck } from "./commands/status";
+import { scheduleList } from "./commands/schedule/list";
+import { scheduleCancel } from "./commands/schedule/cancel";
+import { scheduleModify } from "./commands/schedule/modify";
+import { queueSettings } from "./commands/queue/settings";
+import { queuePreview } from "./commands/queue/preview";
+import { queueNext } from "./commands/queue/next";
 import { createOutputFormatter } from "./lib/output";
 import { PosterBoyError } from "./lib/errors";
 import type { GlobalFlags } from "./lib/types";
@@ -147,8 +155,14 @@ async function main() {
         break;
 
       case "schedule":
-      case "history":
+        await handleScheduleCommand(subcommand, remainingArgs, globalFlags);
+        break;
+
       case "queue":
+        await handleQueueCommand(subcommand, remainingArgs, globalFlags);
+        break;
+
+      case "history":
       case "analytics":
         console.error(`Command '${command}' not implemented yet`);
         process.exit(1);
@@ -254,13 +268,14 @@ async function handlePostCommand(
     case "text":
       await postText(args, globalFlags);
       break;
+    case "photo":
+      await postPhoto(args, globalFlags);
+      break;
     case "video":
       await postVideo(args, globalFlags);
       break;
-    case "photo":
     case "document":
-      console.error(`Post subcommand '${subcommand}' not implemented yet`);
-      process.exit(1);
+      await postDocument(args, globalFlags);
       break;
     default:
       console.error(`Unknown post subcommand: ${subcommand}`);
@@ -278,6 +293,58 @@ async function handleStatusCommand(
   // The subcommand IS the ID for status
   const allArgs = subcommand ? [subcommand, ...args] : args;
   await statusCheck(allArgs, globalFlags);
+}
+
+async function handleScheduleCommand(
+  subcommand: string | undefined,
+  args: string[],
+  globalFlags: GlobalFlags
+): Promise<void> {
+  switch (subcommand) {
+    case "list":
+      await scheduleList(args, globalFlags);
+      break;
+
+    case "cancel":
+      await scheduleCancel(args, globalFlags);
+      break;
+
+    case "modify":
+      await scheduleModify(args, globalFlags);
+      break;
+
+    default:
+      console.error(`Unknown schedule subcommand: ${subcommand}`);
+      console.error("Available: list, cancel, modify");
+      process.exit(1);
+      break;
+  }
+}
+
+async function handleQueueCommand(
+  subcommand: string | undefined,
+  args: string[],
+  globalFlags: GlobalFlags
+): Promise<void> {
+  switch (subcommand) {
+    case "settings":
+      await queueSettings(args, globalFlags);
+      break;
+
+    case "preview":
+      await queuePreview(args, globalFlags);
+      break;
+
+    case "next":
+      await queueNext(args, globalFlags);
+      break;
+
+    default:
+      console.error(`Unknown queue subcommand: ${subcommand}`);
+      console.error("Available: settings, preview, next");
+      process.exit(1);
+      break;
+  }
 }
 
 async function handleError(error: unknown): Promise<void> {

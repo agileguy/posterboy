@@ -5,7 +5,11 @@ import { readConfig, getApiKey, getDefaultProfile } from "../../lib/config";
 import { ApiClient } from "../../lib/api";
 import { createOutputFormatter } from "../../lib/output";
 import { UserError } from "../../lib/errors";
-import { validateMutuallyExclusive } from "../../lib/validation";
+import {
+  validateMutuallyExclusive,
+  validateISODate,
+  validateTimezone,
+} from "../../lib/validation";
 import type { GlobalFlags, DocumentPostParams } from "../../lib/types";
 
 /**
@@ -95,11 +99,32 @@ export async function postDocument(
 
   // Documents are LinkedIn-only - validate if user passed --platforms
   if (values.platforms) {
-    const platformList = (values.platforms as string).split(",").map(p => p.trim()).filter(p => p.length > 0);
-    const nonLinkedin = platformList.filter(p => p !== "linkedin");
+    const platformList = (values.platforms as string)
+      .split(",")
+      .map((p) => p.trim())
+      .filter((p) => p.length > 0);
+    const nonLinkedin = platformList.filter((p) => p !== "linkedin");
     if (nonLinkedin.length > 0) {
-      throw new UserError(`Document posts are only supported on LinkedIn. Unsupported: ${nonLinkedin.join(", ")}`);
+      throw new UserError(
+        `Document posts are only supported on LinkedIn. Unsupported: ${nonLinkedin.join(", ")}`
+      );
     }
+  }
+
+  // Validate scheduling flags
+  if (values.schedule && values.queue) {
+    throw new UserError(
+      "--schedule and --queue are mutually exclusive.\n" +
+        "Use --schedule for a specific date/time, or --queue to use the next available slot."
+    );
+  }
+
+  if (values.schedule) {
+    validateISODate(values.schedule as string);
+  }
+
+  if (values.timezone) {
+    validateTimezone(values.timezone as string);
   }
 
   // Build full DocumentPostParams

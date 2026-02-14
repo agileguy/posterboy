@@ -257,9 +257,14 @@ export interface ScheduledPost {
   job_id: string;
   scheduled_date: string;
   platforms: Platform[];
-  title: string;
+  title?: string;
   content_type: string;
   profile: string;
+}
+
+export interface ScheduleListResult {
+  scheduled_posts: ScheduledPost[];
+  count: number;
 }
 
 export interface ScheduleUpdate {
@@ -277,7 +282,6 @@ export interface QueueSettings {
 }
 
 export interface QueueSettingsUpdate {
-  profile?: string;
   timezone?: string;
   slots?: string[];
   days_of_week?: string[];
@@ -286,6 +290,15 @@ export interface QueueSettingsUpdate {
 export interface QueueSlot {
   datetime: string;
   available: boolean;
+}
+
+export interface QueuePreviewResult {
+  slots: QueueSlot[];
+}
+
+export interface QueueNextSlotResult {
+  next_slot: string;
+  profile: string;
 }
 
 // Platform Pages
