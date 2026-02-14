@@ -26,5 +26,8 @@ jobs:
       - name: Lint
         run: bun run lint
 
+      - name: Debug ApiClient
+        run: bun -e "import { ApiClient } from './src/lib/api'; const c = new ApiClient('test'); console.log('me type:', typeof c.me); console.log('proto keys:', Object.getOwnPropertyNames(Object.getPrototypeOf(c))); console.log('instance keys:', Object.keys(c));"
+
       - name: Test
         run: bun test
