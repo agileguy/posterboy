@@ -1,16 +1,47 @@
 {
   "name": "posterboy",
   "version": "0.1.5",
+  "description": "CLI for posting to social media via Upload-Post.com API",
   "type": "module",
+  "main": "./dist/index.js",
   "bin": {
-    "posterboy": "src/index.ts"
+    "posterboy": "./dist/index.js"
   },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "dev": "bun run src/index.ts",
-    "build": "bun build src/index.ts --compile --outfile posterboy",
+    "build": "bun build src/index.ts --outdir dist --target node --format esm && sed -i '' '1s|#!/usr/bin/env bun|#!/usr/bin/env node|' dist/index.js && chmod +x dist/index.js",
+    "build:binary": "bun build src/index.ts --compile --outfile posterboy",
     "test": "bun test",
     "typecheck": "bunx tsc --noEmit",
-    "lint": "bunx eslint src/ tests/"
+    "lint": "bunx eslint src/ tests/",
+    "prepublishOnly": "bun run build"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "keywords": [
+    "social-media",
+    "cli",
+    "upload-post",
+    "tiktok",
+    "instagram",
+    "youtube",
+    "linkedin",
+    "facebook",
+    "twitter",
+    "threads",
+    "bluesky",
+    "posting"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/agileguy/posterboy.git"
   },
   "dependencies": {
     "upload-post": "^1.0.0"
