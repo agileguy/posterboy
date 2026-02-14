@@ -11,6 +11,7 @@ import { profilesCreate } from "./commands/profiles/create";
 import { profilesDelete } from "./commands/profiles/delete";
 import { profilesConnect } from "./commands/profiles/connect";
 import { platforms, platformsPages } from "./commands/platforms";
+import { postText } from "./commands/post/text";
 import { createOutputFormatter } from "./lib/output";
 import { PosterBoyError } from "./lib/errors";
 import type { GlobalFlags } from "./lib/types";
@@ -136,6 +137,9 @@ async function main() {
         break;
 
       case "post":
+        await handlePostCommand(subcommand, remainingArgs, globalFlags);
+        break;
+
       case "schedule":
       case "status":
       case "history":
@@ -234,6 +238,29 @@ async function handlePlatformsCommand(
   console.error(`Unknown platforms subcommand: ${subcommand}`);
   console.error("Available: pages");
   process.exit(1);
+}
+
+async function handlePostCommand(
+  subcommand: string | undefined,
+  args: string[],
+  globalFlags: GlobalFlags
+): Promise<void> {
+  switch (subcommand) {
+    case "text":
+      await postText(args, globalFlags);
+      break;
+    case "photo":
+    case "video":
+    case "document":
+      console.error(`Post subcommand '${subcommand}' not implemented yet`);
+      process.exit(1);
+      break;
+    default:
+      console.error(`Unknown post subcommand: ${subcommand}`);
+      console.error("Available: text, photo, video, document");
+      process.exit(1);
+      break;
+  }
 }
 
 async function handleError(error: unknown): Promise<void> {

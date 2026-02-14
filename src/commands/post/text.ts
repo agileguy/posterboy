@@ -132,9 +132,12 @@ export async function postText(
   // Resolve platforms
   let platforms: Platform[];
   if (values.platforms) {
-    const platformList = (values.platforms as string).split(",").map((p) => p.trim());
+    const platformList = (values.platforms as string)
+      .split(",")
+      .map((p) => p.trim())
+      .filter((p) => p.length > 0);
     platforms = validatePlatforms(platformList);
-  } else if (config?.default_platforms) {
+  } else if (config?.default_platforms && config.default_platforms.length > 0) {
     platforms = config.default_platforms;
   } else {
     throw new UserError(
@@ -153,8 +156,8 @@ export async function postText(
     profile,
     platforms,
     text,
-    facebook_page: values["facebook-page"],
-    reddit_subreddit: values["reddit-subreddit"],
+    facebook_page: values["facebook-page"] || config?.platform_defaults?.facebook?.page_id,
+    reddit_subreddit: values["reddit-subreddit"] || config?.platform_defaults?.reddit?.subreddit,
   };
 
   // Validate platform-specific requirements
@@ -180,8 +183,29 @@ export async function postText(
   if (values["x-reply-settings"]) postParams.x_reply_settings = values["x-reply-settings"] as string;
   if (values["x-quote-tweet"]) postParams.x_quote_tweet = values["x-quote-tweet"] as string;
   if (values["x-long-text-as-post"] !== undefined) postParams.x_long_text_as_post = values["x-long-text-as-post"] as boolean;
-  if (values["x-poll-options"]) postParams.x_poll_options = values["x-poll-options"] as string[];
-  if (values["x-poll-duration"]) postParams.x_poll_duration = parseInt(values["x-poll-duration"] as string, 10);
+
+  if (values["x-poll-options"]) {
+    const options = (values["x-poll-options"] as string[])
+      .flatMap((opt) => opt.split(","))
+      .map((o) => o.trim())
+      .filter((o) => o.length > 0);
+    if (options.length < 2 || options.length > 4) {
+      throw new UserError(
+        `X polls require 2-4 options. You provided ${options.length}.`
+      );
+    }
+    postParams.x_poll_options = options;
+  }
+
+  if (values["x-poll-duration"]) {
+    const duration = parseInt(values["x-poll-duration"] as string, 10);
+    if (isNaN(duration) || duration < 5 || duration > 10080) {
+      throw new UserError(
+        "Invalid poll duration. Must be a number between 5 and 10080 minutes (5 minutes to 7 days)."
+      );
+    }
+    postParams.x_poll_duration = duration;
+  }
 
   // LinkedIn-specific
   if (values["linkedin-title"]) postParams.linkedin_title = values["linkedin-title"] as string;
